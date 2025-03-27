@@ -107,6 +107,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PlaceStructure"",
+                    ""type"": ""Button"",
+                    ""id"": ""5913f59b-d226-4813-9088-baddb89dd176"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -492,6 +501,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""264ee14c-3963-48ef-a63c-60ed6431b5db"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlaceStructure"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0b1ef3dd-90b0-4947-818d-a1976bbfaf0b"",
+                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlaceStructure"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1088,6 +1119,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
+        m_Player_PlaceStructure = m_Player.FindAction("PlaceStructure", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1176,6 +1208,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Previous;
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Sprint;
+    private readonly InputAction m_Player_PlaceStructure;
     public struct PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1189,6 +1222,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @Previous => m_Wrapper.m_Player_Previous;
         public InputAction @Next => m_Wrapper.m_Player_Next;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
+        public InputAction @PlaceStructure => m_Wrapper.m_Player_PlaceStructure;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1225,6 +1259,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @PlaceStructure.started += instance.OnPlaceStructure;
+            @PlaceStructure.performed += instance.OnPlaceStructure;
+            @PlaceStructure.canceled += instance.OnPlaceStructure;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1256,6 +1293,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @PlaceStructure.started -= instance.OnPlaceStructure;
+            @PlaceStructure.performed -= instance.OnPlaceStructure;
+            @PlaceStructure.canceled -= instance.OnPlaceStructure;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1447,6 +1487,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnPrevious(InputAction.CallbackContext context);
         void OnNext(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
+        void OnPlaceStructure(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
