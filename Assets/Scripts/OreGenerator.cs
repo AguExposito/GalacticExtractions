@@ -20,7 +20,7 @@ public class OreGenerator : MonoBehaviour
 
     private int mapWidth;
     private int mapHeight;
-    public Dictionary<Vector3Int, TileData> tileHealthData = new Dictionary<Vector3Int, TileData>();
+    public Dictionary<Vector3Int, TileData> oreTileData = new Dictionary<Vector3Int, TileData>();
 
     void Start()
     {
@@ -88,9 +88,10 @@ public class OreGenerator : MonoBehaviour
             if (closedSet.Contains(current) || !mapGenerator.wallsTilemap.HasTile(current)) continue;
 
             oreTilemap.SetTile(current, oreType);
-            if (!tileHealthData.ContainsKey(current))
+            if (!oreTileData.ContainsKey(current))
             {
-                tileHealthData.Add(current, new TileData(current, oreType, TileData.tileType.ore));
+                oreTileData.Add(current, new TileData(current, oreType, TileData.tileType.ore));
+                mapGenerator.wallTileData.Remove(current);
             }
             closedSet.Add(current);
 

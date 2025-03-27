@@ -37,7 +37,7 @@ public class MapGenerator : MonoBehaviour
     [Header("Surface Settings")]
     public float caveWidthMultiplier = 1.5f;
 
-    public Dictionary<Vector3Int, TileData> tileHealthData = new Dictionary<Vector3Int, TileData>();
+    public Dictionary<Vector3Int, TileData> wallTileData = new Dictionary<Vector3Int, TileData>();
 
     PlayerSpawner spawner;
 
@@ -127,7 +127,7 @@ public class MapGenerator : MonoBehaviour
                     if (caveNoise > caveThreshold && wallsTilemap.GetTile(new Vector3Int(x, y, 0)) == null)
                     {
                         wallsTilemap.SetTile(new Vector3Int(x, y, 0), wallTile);                        
-                        tileHealthData.Add(new Vector3Int(x, y, 0), new TileData(new Vector3Int(x, y, 0), wallTile, TileData.tileType.wall));
+                        wallTileData.Add(new Vector3Int(x, y, 0), new TileData(new Vector3Int(x, y, 0), wallTile, TileData.tileType.wall));
                     }
                 }
             }

@@ -28,28 +28,45 @@ public class DamageTile : MonoBehaviour
     }
     public void DamageTileData(Vector3Int position)
     {
-        if (mapGenerator.tileHealthData.ContainsKey(position))
-        {
-            mapGenerator.tileHealthData[position].health -= damage;
+        
+        if (oreGenerator.oreTileData.ContainsKey(position)) {
+            oreGenerator.oreTileData[position].health -= damage;
 
-            if (mapGenerator.tileHealthData[position].health <= 0)
-            {
-                DestroyTile(position);
-            }
-            float remainingHealth = (float)mapGenerator.tileHealthData[position].health / (float)mapGenerator.tileHealthData[position].maxHealth;
-            Debug.Log(mapGenerator.tileHealthData[position].health+" " + mapGenerator.tileHealthData[position].maxHealth+" " +remainingHealth);
+            float remainingHealth = (float)oreGenerator.oreTileData[position].health / (float)oreGenerator.oreTileData[position].maxHealth;
             tileHealthUI.ShowHealthBar(position, remainingHealth);
+
+            if (oreGenerator.oreTileData[position].health <= 0)
+            {
+                tileHealthUI.ShowHealthBar(position, 0);
+                //destroys tile
+                oreGenerator.oreTilemap.SetTile(position, null);
+                oreGenerator.oreTileData.Remove(position); // Remueve el tile del diccionario
+
+                if (mapGenerator.wallsTilemap.GetTile(position)!=null) // Remueve el walltile debajo del ore
+                {
+                    mapGenerator.wallsTilemap.SetTile(position, null);
+                }
+            }
+        }
+        else if (mapGenerator.wallTileData.ContainsKey(position))
+        {
+            mapGenerator.wallTileData[position].health -= damage;
+
+            float remainingHealth = (float)mapGenerator.wallTileData[position].health / (float)mapGenerator.wallTileData[position].maxHealth;
+            tileHealthUI.ShowHealthBar(position, remainingHealth);
+
+            if (mapGenerator.wallTileData[position].health <= 0)
+            {
+                tileHealthUI.ShowHealthBar(position, 0);
+                //destroys tile
+                mapGenerator.wallsTilemap.SetTile(position, null);
+                mapGenerator.wallTileData.Remove(position); // Remueve el tile del diccionario
+            }
+
         }
     }
 
-    void DestroyTile(Vector3Int position)
-    {
-        switch (mapGenerator.tileHealthData[position].type) {
-            case TileData.tileType.wall : { mapGenerator.wallsTilemap.SetTile(position, null); } break; // Elimina el tile del mapa
-            case TileData.tileType.ore : { oreGenerator.oreTilemap.SetTile(position, null); } break; // Elimina el tile del mapa
-        }
-        mapGenerator.tileHealthData.Remove(position); // Remueve el tile del diccionario
-    }
+    
     Vector3Int GetTilePositionOnClick(Vector2 screenPosition)
     {
         Vector3 worldPoint = Camera.main.ScreenToWorldPoint(screenPosition);

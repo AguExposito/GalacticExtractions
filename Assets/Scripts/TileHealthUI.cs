@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System.Collections;
 
 public class TileHealthUI : MonoBehaviour
 {
@@ -43,6 +44,8 @@ public class TileHealthUI : MonoBehaviour
         GameObject oldestBar = healthBars.Dequeue();
         oldestBar.SetActive(false); // Asegurar que se resetee antes de reutilizar
         healthBars.Enqueue(oldestBar); // Moverla al final de la cola
+        oldestBar.transform.SetAsLastSibling();// Moverla al final de la jerarquia para que se vea correctamente
+        StartCoroutine(DeactivateHealthBar(oldestBar));
         return oldestBar;
     }
 
@@ -51,5 +54,9 @@ public class TileHealthUI : MonoBehaviour
         Vector3 worldPosition = mapGenerator.wallsTilemap.GetCellCenterWorld(tilePosition);
         worldPosition.y += 0.5f; // Ajustar la posición para que la barra esté sobre el tile
         return worldPosition;
+    }
+    IEnumerator DeactivateHealthBar(GameObject healthBar) { 
+        yield return new WaitForSeconds(3);
+        healthBar.SetActive(false);
     }
 }
