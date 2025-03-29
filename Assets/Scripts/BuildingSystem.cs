@@ -1,10 +1,12 @@
+using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.Tilemaps;
 
 public class BuildingSystem : MonoBehaviour
 {
-    public GameObject[] structures; // Array de estructuras que se pueden colocar
     public Tilemap wallTilemap; // Tilemap de paredes para validar la colocación
     public Tilemap oreTilemap; // Tilemap de ores para validar la colocación
     public Tilemap bedrockTilemap; // Tilemap de bedrock para validar la colocación
@@ -14,49 +16,114 @@ public class BuildingSystem : MonoBehaviour
     public Color invalidColor = new Color(1, 0, 0, 0.5f);
 
     private GameObject currentPreview;
-    private Vector3Int currentCell;
+    private Vector3Int cellPosition;
     private bool canPlace = false;
+    public bool isPlacing = false;
     private GameObject selectedStructure;
     InputSystem_Actions controls;
+    int fingerIndex;
+    bool touchOverUI = false;
     private void Awake()
     {
         // Aseguramos que el sistema de input esté inicializado antes de usarlo
         controls = new InputSystem_Actions();
-        controls.Player.PlaceStructure.performed += ctx => TryPlaceStructure();
+        controls.BuildingSystem.PlaceStructure.performed += ctx => TryPlaceStructure();
+        controls.BuildingSystem.DestroyPreview.performed += ctx => DestroyPreview();
+        EnhancedTouchSupport.Enable();
     }
 
-    void OnEnable() => controls.Enable();
-    void OnDisable() => controls.Disable();
+    void OnEnable() 
+    { 
+        controls.Enable();
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
+        {
+            fingerIndex = finger.index;
+            touchOverUI = !EventSystem.current.IsPointerOverGameObject(fingerIndex);
+            Debug.Log(touchOverUI);
+        };
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp += finger =>
+        {
+            if (canPlace && !!touchOverUI)
+            {
+                TryPlaceStructure();
+            }
+            else
+            {
+                DestroyPreview();
+            }
+        };
+    }
 
+    private void DestroyPreview()
+    {
+        if (currentPreview!=null)
+        {
+            Destroy(currentPreview);
+            currentPreview = null;
+            isPlacing = false;
+        }
+        
+    }
+
+    void OnDisable() 
+    { 
+        controls.Disable();
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= finger =>
+        {
+            fingerIndex = finger.index;
+            touchOverUI = !EventSystem.current.IsPointerOverGameObject(fingerIndex);
+            Debug.Log(touchOverUI);
+        };
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp -= finger =>
+        {
+            if (canPlace && !!touchOverUI)
+            {
+                TryPlaceStructure();
+            }
+            else
+            {
+                Destroy(currentPreview);
+                currentPreview = null;
+                isPlacing = false;
+            }
+        };
+    }
+    
     void Update()
     {
+        if (!isPlacing) { return; }
+
+
+        Vector3 worldPosition = GetMouseOrTouchPosition();
+        worldPosition.z = 0;
+        cellPosition = groundTilemap.WorldToCell(worldPosition);
+        Vector3 snappedPosition = groundTilemap.GetCellCenterWorld(cellPosition);
+
         if (currentPreview != null)
         {
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            worldPosition.z = 0;
-            currentCell = wallTilemap.WorldToCell(worldPosition);
-            Vector3 snappedPosition = wallTilemap.GetCellCenterWorld(currentCell);
-
             currentPreview.transform.position = snappedPosition;
-            canPlace = ValidatePosition(currentCell, selectedStructure);
+            canPlace = ValidatePosition(cellPosition, selectedStructure);
 
             SpriteRenderer sr = currentPreview.GetComponent<SpriteRenderer>();
             sr.color = canPlace ? validColor : invalidColor;
 
-           
         }
+        
     }
 
-    public void SelectStructure(int index)
+    public void SelectStructure(GameObject selectedStructure)
     {
-        if (currentPreview != null)
+        if (!isPlacing)
         {
-            Destroy(currentPreview);
+            if (currentPreview != null)
+            {
+                Destroy(currentPreview);
+            }
+            this.selectedStructure = selectedStructure;
+            currentPreview = Instantiate(selectedStructure, previewParent);
+            currentPreview.GetComponent<SpriteRenderer>().color = validColor;
+            isPlacing = true;
         }
-
-        selectedStructure = structures[index];
-        currentPreview = Instantiate(selectedStructure, previewParent);
-        currentPreview.GetComponent<SpriteRenderer>().color = validColor;
     }
 
     bool ValidatePosition(Vector3Int cellPosition, GameObject structure)
@@ -82,10 +149,19 @@ public class BuildingSystem : MonoBehaviour
     {
         if (currentPreview != null && canPlace)
         {
-            Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity,previewParent);
+            Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
             Destroy(currentPreview);
+            isPlacing = false;
         }
     }
-
+    Vector3 GetMouseOrTouchPosition()
+    {
+        if (Touchscreen.current != null && (Touchscreen.current.primaryTouch.press.isPressed || Touchscreen.current.primaryTouch.press.wasReleasedThisFrame))
+        {
+            return Camera.main.ScreenToWorldPoint(Touchscreen.current.primaryTouch.position.ReadValue());
+        }
+            
+        return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+    }
 
 }

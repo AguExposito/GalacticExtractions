@@ -107,15 +107,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""PlaceStructure"",
-                    ""type"": ""Button"",
-                    ""id"": ""5913f59b-d226-4813-9088-baddb89dd176"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -501,28 +492,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Crouch"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""264ee14c-3963-48ef-a63c-60ed6431b5db"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""PlaceStructure"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""0b1ef3dd-90b0-4947-818d-a1976bbfaf0b"",
-                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""PlaceStructure"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1043,6 +1012,54 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""BuildingSystem"",
+            ""id"": ""38c2f8fc-a411-43ef-8e84-c45a99f13328"",
+            ""actions"": [
+                {
+                    ""name"": ""PlaceStructure"",
+                    ""type"": ""Button"",
+                    ""id"": ""e9dba766-c00c-4aad-8f44-01f44e0b84ae"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DestroyPreview"",
+                    ""type"": ""Button"",
+                    ""id"": ""cddbc506-378a-475c-b8a1-49b157b11d63"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""cb76c494-ba32-4c00-b038-c36b57594613"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlaceStructure"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""721df477-6769-4055-b307-3fe623a03579"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DestroyPreview"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1119,7 +1136,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
-        m_Player_PlaceStructure = m_Player.FindAction("PlaceStructure", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1132,12 +1148,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_ScrollWheel = m_UI.FindAction("ScrollWheel", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+        // BuildingSystem
+        m_BuildingSystem = asset.FindActionMap("BuildingSystem", throwIfNotFound: true);
+        m_BuildingSystem_PlaceStructure = m_BuildingSystem.FindAction("PlaceStructure", throwIfNotFound: true);
+        m_BuildingSystem_DestroyPreview = m_BuildingSystem.FindAction("DestroyPreview", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
     {
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_BuildingSystem.enabled, "This will cause a leak and performance issues, InputSystem_Actions.BuildingSystem.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1208,7 +1229,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Previous;
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Sprint;
-    private readonly InputAction m_Player_PlaceStructure;
     public struct PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1222,7 +1242,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @Previous => m_Wrapper.m_Player_Previous;
         public InputAction @Next => m_Wrapper.m_Player_Next;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
-        public InputAction @PlaceStructure => m_Wrapper.m_Player_PlaceStructure;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1259,9 +1278,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
-            @PlaceStructure.started += instance.OnPlaceStructure;
-            @PlaceStructure.performed += instance.OnPlaceStructure;
-            @PlaceStructure.canceled += instance.OnPlaceStructure;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1293,9 +1309,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
-            @PlaceStructure.started -= instance.OnPlaceStructure;
-            @PlaceStructure.performed -= instance.OnPlaceStructure;
-            @PlaceStructure.canceled -= instance.OnPlaceStructure;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1431,6 +1444,60 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // BuildingSystem
+    private readonly InputActionMap m_BuildingSystem;
+    private List<IBuildingSystemActions> m_BuildingSystemActionsCallbackInterfaces = new List<IBuildingSystemActions>();
+    private readonly InputAction m_BuildingSystem_PlaceStructure;
+    private readonly InputAction m_BuildingSystem_DestroyPreview;
+    public struct BuildingSystemActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public BuildingSystemActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @PlaceStructure => m_Wrapper.m_BuildingSystem_PlaceStructure;
+        public InputAction @DestroyPreview => m_Wrapper.m_BuildingSystem_DestroyPreview;
+        public InputActionMap Get() { return m_Wrapper.m_BuildingSystem; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(BuildingSystemActions set) { return set.Get(); }
+        public void AddCallbacks(IBuildingSystemActions instance)
+        {
+            if (instance == null || m_Wrapper.m_BuildingSystemActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_BuildingSystemActionsCallbackInterfaces.Add(instance);
+            @PlaceStructure.started += instance.OnPlaceStructure;
+            @PlaceStructure.performed += instance.OnPlaceStructure;
+            @PlaceStructure.canceled += instance.OnPlaceStructure;
+            @DestroyPreview.started += instance.OnDestroyPreview;
+            @DestroyPreview.performed += instance.OnDestroyPreview;
+            @DestroyPreview.canceled += instance.OnDestroyPreview;
+        }
+
+        private void UnregisterCallbacks(IBuildingSystemActions instance)
+        {
+            @PlaceStructure.started -= instance.OnPlaceStructure;
+            @PlaceStructure.performed -= instance.OnPlaceStructure;
+            @PlaceStructure.canceled -= instance.OnPlaceStructure;
+            @DestroyPreview.started -= instance.OnDestroyPreview;
+            @DestroyPreview.performed -= instance.OnDestroyPreview;
+            @DestroyPreview.canceled -= instance.OnDestroyPreview;
+        }
+
+        public void RemoveCallbacks(IBuildingSystemActions instance)
+        {
+            if (m_Wrapper.m_BuildingSystemActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IBuildingSystemActions instance)
+        {
+            foreach (var item in m_Wrapper.m_BuildingSystemActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_BuildingSystemActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public BuildingSystemActions @BuildingSystem => new BuildingSystemActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1487,7 +1554,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnPrevious(InputAction.CallbackContext context);
         void OnNext(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
-        void OnPlaceStructure(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
@@ -1501,5 +1567,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnScrollWheel(InputAction.CallbackContext context);
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+    }
+    public interface IBuildingSystemActions
+    {
+        void OnPlaceStructure(InputAction.CallbackContext context);
+        void OnDestroyPreview(InputAction.CallbackContext context);
     }
 }
