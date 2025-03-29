@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - player
+  - Building
   layers:
   - Default
   - TransparentFX

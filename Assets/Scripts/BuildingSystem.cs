@@ -15,7 +15,7 @@ public class BuildingSystem : MonoBehaviour
     public Color validColor = new Color(0, 1, 0, 0.5f);
     public Color invalidColor = new Color(1, 0, 0, 0.5f);
 
-    private Dictionary<Vector2[], GameObject> buildings;
+    private Dictionary<Vector3[], GameObject> buildings;
     private GameObject currentPreview;
     private Vector3Int cellPosition;
     private bool canPlace = false;
@@ -28,13 +28,23 @@ public class BuildingSystem : MonoBehaviour
     {
         // Aseguramos que el sistema de input esté inicializado antes de usarlo
         controls = new InputSystem_Actions();
-        controls.BuildingSystem.PlaceStructure.performed += ctx => TryPlaceStructure();
-        controls.BuildingSystem.DestroyPreview.performed += ctx => DestroyPreview();
         EnhancedTouchSupport.Enable();
     }
     void OnEnable() 
     { 
         controls.Enable();
+
+        //PC
+        controls.BuildingSystem.PlaceStructure.performed += ctx =>
+        {
+            if (canPlace)
+            {
+                TryPlaceStructure();
+            }
+        };
+        controls.BuildingSystem.DestroyPreview.performed += ctx => DestroyPreview();
+
+        //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
         {
             fingerIndex = finger.index;
@@ -54,20 +64,21 @@ public class BuildingSystem : MonoBehaviour
         };
     }
 
-    private void DestroyPreview()
-    {
-        if (currentPreview!=null)
-        {
-            Destroy(currentPreview);
-            currentPreview = null;
-            isPlacing = false;
-        }
-        
-    }
-
     void OnDisable() 
     { 
         controls.Disable();
+
+        //PC
+        controls.BuildingSystem.PlaceStructure.performed -= ctx =>
+        {
+            if (canPlace)
+            {
+                TryPlaceStructure();
+            }
+        };
+        controls.BuildingSystem.DestroyPreview.performed -= ctx => DestroyPreview();
+
+        //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= finger =>
         {
             fingerIndex = finger.index;
@@ -102,14 +113,25 @@ public class BuildingSystem : MonoBehaviour
         if (currentPreview != null)
         {
             currentPreview.transform.position = snappedPosition;
-            canPlace = ValidatePosition();
+            canPlace = ValidatePosition() && ValidatePositionBuilding();
 
             UpdateLineRenderer(); 
 
             SpriteRenderer sr = currentPreview.GetComponent<SpriteRenderer>();
-            sr.color = canPlace ? validColor : invalidColor;
+            sr.color = canPlace? validColor : invalidColor;
         }
         
+    }
+
+    private void DestroyPreview()
+    {
+        if (currentPreview != null)
+        {
+            Destroy(currentPreview);
+            currentPreview = null;
+            isPlacing = false;
+        }
+
     }
 
     public void SelectStructure(GameObject selectedStructure)
@@ -123,6 +145,7 @@ public class BuildingSystem : MonoBehaviour
             this.selectedStructure = selectedStructure;
             currentPreview = Instantiate(selectedStructure, previewParent);
             currentPreview.GetComponent<SpriteRenderer>().color = validColor;
+            currentPreview.GetComponent<SpriteRenderer>().sortingOrder = 20;
 
 
             LineRenderer border = currentPreview.AddComponent<LineRenderer>();
@@ -148,11 +171,6 @@ public class BuildingSystem : MonoBehaviour
         if (border == null) return;
         // Obtener el tamaño y la posición del sprite
         Bounds bounds = currentPreview.GetComponent<SpriteRenderer>().bounds;
-        Vector3Int minCell = groundTilemap.WorldToCell(bounds.min);
-        Vector3Int maxCell = groundTilemap.WorldToCell(bounds.max);
-
-        Debug.Log(bounds.size);
-
 
         // Definir las esquinas del borde
         Vector3[] corners = new Vector3[]
@@ -161,8 +179,6 @@ public class BuildingSystem : MonoBehaviour
             new Vector3(0.5f,-0.5f,0),
             new Vector3(0.5f,0.5f,0),
             new Vector3(-0.5f,0.5f,0),
-
-            //bottomLeft, bottomRight, topRight, topLeft
         };
 
         border.SetPositions(corners);
@@ -183,7 +199,7 @@ public class BuildingSystem : MonoBehaviour
                 Vector3Int checkPos = new Vector3Int(x, y, 0);
                 foreach (Tilemap tilemap in tilemaps)
                 {
-                    if (tilemap.HasTile(checkPos))
+                    if (tilemap.HasTile(checkPos) || !groundTilemap.HasTile(checkPos))
                     {
                         return false;
                     }
@@ -195,6 +211,26 @@ public class BuildingSystem : MonoBehaviour
     }
 
 
+    bool ValidatePositionBuilding()
+    {
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+
+        Vector2 size = currentPreview.transform.localScale; 
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(mousePosition, size, 0f);
+
+        // Recorremos todos los colliders que hemos detectado
+        foreach (Collider2D collider in colliders)
+        {
+            if (collider.CompareTag("Building"))
+            {
+                Debug.Log("Se ha detectado un objeto 'Building' en la posición del mouse");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     void TryPlaceStructure()
     {
         if (currentPreview != null && canPlace)
@@ -202,7 +238,8 @@ public class BuildingSystem : MonoBehaviour
             GameObject building = Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
             Destroy(currentPreview);
             isPlacing = false;
-            //buildings.Add(building);
+            building.GetComponent<Collider2D>().enabled = true;
+            building.tag = "Building";
         }
     }
     Vector3 GetMouseOrTouchPosition()
