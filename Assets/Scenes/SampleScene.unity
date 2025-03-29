@@ -1662,16 +1662,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c6c72c4aae09994f8f62736101e5b57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallTilemap: {fileID: 349602040}
-  oreTilemap: {fileID: 1640328339}
-  bedrockTilemap: {fileID: 1549974927}
+  tilemaps:
+  - {fileID: 349602040}
+  - {fileID: 1640328339}
+  - {fileID: 1549974927}
   groundTilemap: {fileID: 99442483}
   previewParent: {fileID: 85469982}
+  lineRendererBoundaries: {fileID: 5418378036711855500, guid: 7605dffeb922b8d469d8473701379eac, type: 3}
   validColor: {r: 0, g: 1, b: 0, a: 0.5}
   invalidColor: {r: 1, g: 0, b: 0, a: 0.5}
-  button: {fileID: 1160708188}
-  isDragging: 0
-  isPlacing: 0
 --- !u!1 &1021992927
 GameObject:
   m_ObjectHideFlags: 0

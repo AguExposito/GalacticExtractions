@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -7,18 +9,17 @@ using UnityEngine.Tilemaps;
 
 public class BuildingSystem : MonoBehaviour
 {
-    public Tilemap wallTilemap; // Tilemap de paredes para validar la colocación
-    public Tilemap oreTilemap; // Tilemap de ores para validar la colocación
-    public Tilemap bedrockTilemap; // Tilemap de bedrock para validar la colocación
+    public Tilemap[] tilemaps;
     public Tilemap groundTilemap; // Tilemap de bedrock para validar la colocación
     public Transform previewParent; // Parent para manejar la preview
     public Color validColor = new Color(0, 1, 0, 0.5f);
     public Color invalidColor = new Color(1, 0, 0, 0.5f);
 
+    private Dictionary<Vector2[], GameObject> buildings;
     private GameObject currentPreview;
     private Vector3Int cellPosition;
     private bool canPlace = false;
-    public bool isPlacing = false;
+    private bool isPlacing = false;
     private GameObject selectedStructure;
     InputSystem_Actions controls;
     int fingerIndex;
@@ -31,7 +32,6 @@ public class BuildingSystem : MonoBehaviour
         controls.BuildingSystem.DestroyPreview.performed += ctx => DestroyPreview();
         EnhancedTouchSupport.Enable();
     }
-
     void OnEnable() 
     { 
         controls.Enable();
@@ -102,11 +102,12 @@ public class BuildingSystem : MonoBehaviour
         if (currentPreview != null)
         {
             currentPreview.transform.position = snappedPosition;
-            canPlace = ValidatePosition(cellPosition, selectedStructure);
+            canPlace = ValidatePosition();
+
+            UpdateLineRenderer(); 
 
             SpriteRenderer sr = currentPreview.GetComponent<SpriteRenderer>();
             sr.color = canPlace ? validColor : invalidColor;
-
         }
         
     }
@@ -122,36 +123,86 @@ public class BuildingSystem : MonoBehaviour
             this.selectedStructure = selectedStructure;
             currentPreview = Instantiate(selectedStructure, previewParent);
             currentPreview.GetComponent<SpriteRenderer>().color = validColor;
+
+
+            LineRenderer border = currentPreview.AddComponent<LineRenderer>();
+            border.useWorldSpace = false;
+            border.startWidth = 0.1f;
+            border.endWidth = 0.1f;
+            border.loop = true;
+            border.positionCount = 4; // 4 esquinas
+
+            // Material para que no se vuelva invisible
+            Material lineMaterial = new Material(Shader.Find("Sprites/Default"));
+            border.material = lineMaterial;
+            border.startColor = Color.green;
+            border.endColor = Color.green;
+            border.sortingOrder = 10; // Asegurar que esté visible sobre el sprite
+
+            UpdateLineRenderer();
             isPlacing = true;
         }
     }
+    void UpdateLineRenderer() {
+        LineRenderer border = currentPreview.GetComponent<LineRenderer>();
+        if (border == null) return;
+        // Obtener el tamaño y la posición del sprite
+        Bounds bounds = currentPreview.GetComponent<SpriteRenderer>().bounds;
+        Vector3Int minCell = groundTilemap.WorldToCell(bounds.min);
+        Vector3Int maxCell = groundTilemap.WorldToCell(bounds.max);
 
-    bool ValidatePosition(Vector3Int cellPosition, GameObject structure)
-    {
-        Bounds structureBounds = structure.GetComponent<SpriteRenderer>().bounds;
-        Vector3Int size = new Vector3Int(Mathf.CeilToInt(structureBounds.size.x), Mathf.CeilToInt(structureBounds.size.y), 1);
+        Debug.Log(bounds.size);
 
-        for (int x = 0; x < size.x; x++)
+
+        // Definir las esquinas del borde
+        Vector3[] corners = new Vector3[]
         {
-            for (int y = 0; y < size.y; y++)
+            new Vector3(-0.5f,-0.5f,0),
+            new Vector3(0.5f,-0.5f,0),
+            new Vector3(0.5f,0.5f,0),
+            new Vector3(-0.5f,0.5f,0),
+
+            //bottomLeft, bottomRight, topRight, topLeft
+        };
+
+        border.SetPositions(corners);
+    }
+
+    bool ValidatePosition()
+    {
+        if (currentPreview == null) return false;
+
+        Bounds bounds = currentPreview.GetComponent<SpriteRenderer>().bounds;
+        Vector3Int minCell = groundTilemap.WorldToCell(bounds.min);
+        Vector3Int maxCell = groundTilemap.WorldToCell(bounds.max);
+
+        for (int x = minCell.x; x <= maxCell.x; x++)
+        {
+            for (int y = minCell.y; y <= maxCell.y; y++)
             {
-                Vector3Int checkPos = cellPosition + new Vector3Int(x, y, 0);
-                if (wallTilemap.HasTile(checkPos) || oreTilemap.HasTile(checkPos) || bedrockTilemap.HasTile(checkPos) || !groundTilemap.HasTile(checkPos))
+                Vector3Int checkPos = new Vector3Int(x, y, 0);
+                foreach (Tilemap tilemap in tilemaps)
                 {
-                    return false; // Hay colisión con una pared
+                    if (tilemap.HasTile(checkPos))
+                    {
+                        return false;
+                    }
                 }
             }
         }
+
         return true;
     }
+
 
     void TryPlaceStructure()
     {
         if (currentPreview != null && canPlace)
         {
-            Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
+            GameObject building = Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
             Destroy(currentPreview);
             isPlacing = false;
+            //buildings.Add(building);
         }
     }
     Vector3 GetMouseOrTouchPosition()
