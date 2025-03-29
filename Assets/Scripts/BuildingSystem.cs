@@ -215,7 +215,11 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
-        Vector2 size = currentPreview.transform.localScale; 
+        Vector3Int cellPosition = groundTilemap.WorldToCell(mousePosition);
+        Vector2 cellCenterPosition = groundTilemap.GetCellCenterWorld(cellPosition);
+
+
+        Vector2 size = currentPreview.transform.localScale - new Vector3(1,1,0); 
         Collider2D[] colliders = Physics2D.OverlapBoxAll(mousePosition, size, 0f);
 
         // Recorremos todos los colliders que hemos detectado
