@@ -15,7 +15,6 @@ public class BuildingSystem : MonoBehaviour
     public Color validColor = new Color(0, 1, 0, 0.5f);
     public Color invalidColor = new Color(1, 0, 0, 0.5f);
 
-    private Dictionary<Vector3[], GameObject> buildings;
     private GameObject currentPreview;
     private Vector3Int cellPosition;
     private bool canPlace = false;
@@ -118,6 +117,9 @@ public class BuildingSystem : MonoBehaviour
             UpdateLineRenderer(); 
 
             SpriteRenderer sr = currentPreview.GetComponent<SpriteRenderer>();
+            LineRenderer ln=currentPreview.GetComponent<LineRenderer>();
+            ln.startColor = canPlace ? validColor : invalidColor;
+            ln.endColor = canPlace ? validColor : invalidColor;
             sr.color = canPlace? validColor : invalidColor;
         }
         
@@ -158,8 +160,8 @@ public class BuildingSystem : MonoBehaviour
             // Material para que no se vuelva invisible
             Material lineMaterial = new Material(Shader.Find("Sprites/Default"));
             border.material = lineMaterial;
-            border.startColor = Color.green;
-            border.endColor = Color.green;
+            border.startColor = Color.white;
+            border.endColor = Color.white;
             border.sortingOrder = 10; // Asegurar que esté visible sobre el sprite
 
             UpdateLineRenderer();
@@ -213,7 +215,7 @@ public class BuildingSystem : MonoBehaviour
 
     bool ValidatePositionBuilding()
     {
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector2 mousePosition = GetMouseOrTouchPosition2D();
 
         Vector3Int cellPosition = groundTilemap.WorldToCell(mousePosition);
         Vector2 cellCenterPosition = groundTilemap.GetCellCenterWorld(cellPosition);
@@ -225,7 +227,7 @@ public class BuildingSystem : MonoBehaviour
         // Recorremos todos los colliders que hemos detectado
         foreach (Collider2D collider in colliders)
         {
-            if (collider.CompareTag("Building"))
+            if (collider.CompareTag("Building") || collider.CompareTag("Player"))
             {
                 Debug.Log("Se ha detectado un objeto 'Building' en la posición del mouse");
                 return false;
@@ -253,6 +255,15 @@ public class BuildingSystem : MonoBehaviour
             return Camera.main.ScreenToWorldPoint(Touchscreen.current.primaryTouch.position.ReadValue());
         }
             
+        return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+    }
+    Vector2 GetMouseOrTouchPosition2D()
+    {
+        if (Touchscreen.current != null && (Touchscreen.current.primaryTouch.press.isPressed || Touchscreen.current.primaryTouch.press.wasReleasedThisFrame))
+        {
+            return Camera.main.ScreenToWorldPoint(Touchscreen.current.primaryTouch.position.ReadValue());
+        }
+
         return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
     }
 

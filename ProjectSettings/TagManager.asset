@@ -6,6 +6,8 @@ TagManager:
   tags:
   - player
   - Building
+  - OreTilemap
+  - WallsTilemap
   layers:
   - Default
   - TransparentFX

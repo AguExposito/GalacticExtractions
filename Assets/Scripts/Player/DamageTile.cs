@@ -4,8 +4,8 @@ using UnityEngine.InputSystem.EnhancedTouch;
 
 public class DamageTile : MonoBehaviour
 {
-    MapGenerator mapGenerator;
-    OreGenerator oreGenerator;
+    public MapGenerator mapGenerator;
+    public OreGenerator oreGenerator;
     TileHealthUI tileHealthUI;
     InputSystem_Actions controls;
     public int damage=1;
@@ -26,7 +26,7 @@ public class DamageTile : MonoBehaviour
     {
         
     }
-    public void DamageTileData(Vector3Int position)
+    public void DamageTileData(Vector3Int position, int damage)
     {
         
         if (oreGenerator.oreTileData.ContainsKey(position)) {
@@ -81,14 +81,14 @@ public class DamageTile : MonoBehaviour
         controls.Player.Attack.performed += ctx =>
         {
             Vector2 screenPosition = Mouse.current.position.ReadValue();
-            DamageTileData(GetTilePositionOnClick(screenPosition));
+            DamageTileData(GetTilePositionOnClick(screenPosition), damage);
         };
 
         // **Móviles: Detectar toque en la pantalla**
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
         {
             Vector2 touchPosition = finger.screenPosition;
-            DamageTileData(GetTilePositionOnClick(touchPosition));
+            DamageTileData(GetTilePositionOnClick(touchPosition), damage);
         };
     }
 
@@ -99,7 +99,7 @@ public class DamageTile : MonoBehaviour
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= finger =>
         {
             Vector2 touchPosition = finger.screenPosition;
-            DamageTileData(GetTilePositionOnClick(touchPosition));
+            DamageTileData(GetTilePositionOnClick(touchPosition), damage);
         };
     }
 }
