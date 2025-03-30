@@ -149,7 +149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellsToDrill: 10
-  extractionSpeed: 10
+  extractionDamage: 5
+  timePerDmgTick: 0.2
   tubeTime: 3
   drillHead: {fileID: 4806498723568632872}
   drillTubePivot: {fileID: 8330788221979467320}

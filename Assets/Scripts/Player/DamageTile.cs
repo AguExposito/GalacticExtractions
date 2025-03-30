@@ -31,6 +31,7 @@ public class DamageTile : MonoBehaviour
         
         if (oreGenerator.oreTileData.ContainsKey(position)) {
             oreGenerator.oreTileData[position].health -= damage;
+            oreGenerator.oreTileData[position].ExtractOre();
 
             float remainingHealth = (float)oreGenerator.oreTileData[position].health / (float)oreGenerator.oreTileData[position].maxHealth;
             tileHealthUI.ShowHealthBar(position, remainingHealth);
