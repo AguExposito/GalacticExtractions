@@ -8,6 +8,7 @@ TagManager:
   - Building
   - OreTilemap
   - WallsTilemap
+  - BiomeResourcesHUD
   layers:
   - Default
   - TransparentFX
