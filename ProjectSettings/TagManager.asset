@@ -9,6 +9,7 @@ TagManager:
   - OreTilemap
   - WallsTilemap
   - BiomeResourcesHUD
+  - EffectReach
   layers:
   - Default
   - TransparentFX

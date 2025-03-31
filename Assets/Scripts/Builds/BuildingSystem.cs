@@ -44,6 +44,26 @@ public class BuildingSystem : MonoBehaviour
         };
         controls.BuildingSystem.DestroyPreview.performed += ctx => DestroyPreview();
         controls.BuildingSystem.RotatePreview.performed += ctx => RotatePreview();
+        controls.BuildingSystem.ShowReach.performed += ctx =>
+        {
+            GameObject[] go = GameObject.FindGameObjectsWithTag("EffectReach");
+            foreach (GameObject gameObject in go) 
+            { 
+                if(gameObject.tag != "EffectReach") continue;
+                gameObject.GetComponent<LineRenderer>().enabled = true; 
+            }
+            Debug.Log("ShowStarted" + go.Length);
+        }; 
+        controls.BuildingSystem.ShowReach.canceled += ctx =>
+        {
+            GameObject[] go = GameObject.FindGameObjectsWithTag("EffectReach");
+            foreach (GameObject gameObject in go)
+            {
+                if (gameObject.tag != "EffectReach") continue;
+                gameObject.GetComponent<LineRenderer>().enabled = false;
+            }
+            Debug.Log("ShowStarted" + go.Length);
+        };
 
         //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
@@ -51,6 +71,17 @@ public class BuildingSystem : MonoBehaviour
             fingerIndex = finger.index;
             touchOverUI = !EventSystem.current.IsPointerOverGameObject(fingerIndex);
             Debug.Log(touchOverUI);
+
+            if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
+            {
+                GameObject[] go = GameObject.FindGameObjectsWithTag("EffectReach");
+                foreach (GameObject gameObject in go)
+                {
+                    if (gameObject.tag != "EffectReach") continue;
+                    gameObject.GetComponent<LineRenderer>().enabled = true;
+                }
+                Debug.Log("ShowStarted" + go.Length);
+            }
         };
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp += finger =>
         {
@@ -62,6 +93,17 @@ public class BuildingSystem : MonoBehaviour
             {
                 DestroyPreview();
             }
+
+            if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
+            {
+                GameObject[] go = GameObject.FindGameObjectsWithTag("EffectReach");
+                foreach (GameObject gameObject in go)
+                {
+                    if (gameObject.tag != "EffectReach") continue;
+                    gameObject.GetComponent<LineRenderer>().enabled = false;
+                }
+                Debug.Log("ShowStarted" + go.Length);
+            }
         };
     }
 
@@ -69,6 +111,7 @@ public class BuildingSystem : MonoBehaviour
     void OnDisable() 
     { 
         controls.Disable();
+
 
         //PC
         controls.BuildingSystem.PlaceStructure.performed -= ctx =>
@@ -79,6 +122,25 @@ public class BuildingSystem : MonoBehaviour
             }
         };
         controls.BuildingSystem.DestroyPreview.performed -= ctx => DestroyPreview();
+        controls.BuildingSystem.RotatePreview.performed -= ctx => RotatePreview();
+        controls.BuildingSystem.ShowReach.performed -= ctx =>
+        {
+            LineRenderer[] lineRenderers = previewParent.gameObject.GetComponentsInChildren<LineRenderer>();
+            foreach (LineRenderer lineRenderer in lineRenderers)
+            {
+                if (lineRenderer.tag != "EffectReach") continue;
+                lineRenderer.enabled = true;
+            }
+        };
+        controls.BuildingSystem.ShowReach.canceled -= ctx =>
+        {
+            LineRenderer[] lineRenderers = previewParent.gameObject.GetComponentsInChildren<LineRenderer>();
+            foreach (LineRenderer lineRenderer in lineRenderers)
+            {
+                if (lineRenderer.tag != "EffectReach") continue;
+                lineRenderer.enabled = false;
+            }
+        };
 
         //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= finger =>
@@ -86,6 +148,16 @@ public class BuildingSystem : MonoBehaviour
             fingerIndex = finger.index;
             touchOverUI = !EventSystem.current.IsPointerOverGameObject(fingerIndex);
             Debug.Log(touchOverUI);
+
+            if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
+            {
+                LineRenderer[] lineRenderers = previewParent.gameObject.GetComponentsInChildren<LineRenderer>();
+                foreach (LineRenderer lineRenderer in lineRenderers)
+                {
+                    if (lineRenderer.tag != "EffectReach") continue;
+                    lineRenderer.enabled = true;
+                }
+            }
         };
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp -= finger =>
         {
@@ -95,9 +167,17 @@ public class BuildingSystem : MonoBehaviour
             }
             else
             {
-                Destroy(currentPreview);
-                currentPreview = null;
-                isPlacing = false;
+                DestroyPreview();
+            }
+
+            if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
+            {
+                LineRenderer[] lineRenderers = previewParent.gameObject.GetComponentsInChildren<LineRenderer>();
+                foreach (LineRenderer lineRenderer in lineRenderers)
+                {
+                    if (lineRenderer.tag != "EffectReach") continue;
+                    lineRenderer.enabled = false;
+                }
             }
         };
     }
