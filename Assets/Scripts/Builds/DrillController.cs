@@ -1,9 +1,8 @@
-using System;
+
 using System.Collections;
-using System.Drawing;
 using UnityEngine;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 
 public class DrillController : MonoBehaviour
 {
@@ -13,6 +12,7 @@ public class DrillController : MonoBehaviour
     public float tubeTime;
     public GameObject drillHead;
     public GameObject drillTube;
+    public GameObject effectReach;
     Vector3Int nextCellPos;
     Vector3 initialHeadPos;
     bool isExtending;
@@ -21,6 +21,21 @@ public class DrillController : MonoBehaviour
     Tilemap wallsTilemap;
     DamageTile damageTile;
     Coroutine dmgCoroutine;
+    InputSystem_Actions controls;
+    private void Awake()
+    {
+        // Aseguramos que el sistema de input esté inicializado antes de usarlo
+        controls = new InputSystem_Actions();
+        EnhancedTouchSupport.Enable();
+        Vector3[] corners = new Vector3[]
+        {
+            new Vector3(-0.5f,-0.5f,0),//BL
+            new Vector3(0.5f,-0.5f,0),//BR
+            new Vector3(0.5f,0.5f+cellsToDrill,0),//TR
+            new Vector3(-0.5f,0.5f+cellsToDrill,0),//TL
+        };
+        effectReach.GetComponent<LineRenderer>().SetPositions(corners);
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -134,6 +149,65 @@ public class DrillController : MonoBehaviour
             yield return new WaitForSeconds(timePerTick); // Espera antes de aplicar el siguiente daño
         }
         
+    }
+
+
+    void OnEnable()
+    {
+        controls.Enable();
+        
+        //PC
+        controls.BuildingSystem.ShowReach.performed += ctx =>
+        {
+
+            if(effectReach!=null)
+                effectReach.SetActive(true);
+        };
+        controls.BuildingSystem.ShowReach.canceled += ctx =>
+        {
+            if(effectReach!=null)
+                effectReach.SetActive(false);
+        };
+        //Android
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
+        {
+            if (effectReach != null && UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count>2)
+                effectReach.SetActive(true);
+        };
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp += finger =>
+        {
+            if (effectReach != null)
+                effectReach.SetActive(false);
+        };
+    }
+
+    void OnDisable()
+    {
+        controls.Disable();
+
+        //PC
+        controls.BuildingSystem.ShowReach.performed -= ctx =>
+        {
+
+            if (effectReach != null)
+                effectReach.SetActive(true);
+        };
+        controls.BuildingSystem.ShowReach.canceled -= ctx =>
+        {
+            if (effectReach != null)
+                effectReach.SetActive(false);
+        };
+        //Android
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= finger =>
+        {
+            if (effectReach != null && UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count > 2)
+                effectReach.SetActive(true);
+        };
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp -= finger =>
+        {
+            if (effectReach != null)
+                effectReach.SetActive(false);
+        };
     }
 
 }

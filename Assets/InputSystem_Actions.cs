@@ -1034,6 +1034,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShowReach"",
+                    ""type"": ""Button"",
+                    ""id"": ""fb1b7053-d451-414d-8322-d1555869c2b1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1056,6 +1065,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""DestroyPreview"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b9d22def-edbd-4a45-aecb-a7bc9978c335"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShowReach"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1152,6 +1172,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_BuildingSystem = asset.FindActionMap("BuildingSystem", throwIfNotFound: true);
         m_BuildingSystem_PlaceStructure = m_BuildingSystem.FindAction("PlaceStructure", throwIfNotFound: true);
         m_BuildingSystem_DestroyPreview = m_BuildingSystem.FindAction("DestroyPreview", throwIfNotFound: true);
+        m_BuildingSystem_ShowReach = m_BuildingSystem.FindAction("ShowReach", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1450,12 +1471,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private List<IBuildingSystemActions> m_BuildingSystemActionsCallbackInterfaces = new List<IBuildingSystemActions>();
     private readonly InputAction m_BuildingSystem_PlaceStructure;
     private readonly InputAction m_BuildingSystem_DestroyPreview;
+    private readonly InputAction m_BuildingSystem_ShowReach;
     public struct BuildingSystemActions
     {
         private @InputSystem_Actions m_Wrapper;
         public BuildingSystemActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
         public InputAction @PlaceStructure => m_Wrapper.m_BuildingSystem_PlaceStructure;
         public InputAction @DestroyPreview => m_Wrapper.m_BuildingSystem_DestroyPreview;
+        public InputAction @ShowReach => m_Wrapper.m_BuildingSystem_ShowReach;
         public InputActionMap Get() { return m_Wrapper.m_BuildingSystem; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1471,6 +1494,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @DestroyPreview.started += instance.OnDestroyPreview;
             @DestroyPreview.performed += instance.OnDestroyPreview;
             @DestroyPreview.canceled += instance.OnDestroyPreview;
+            @ShowReach.started += instance.OnShowReach;
+            @ShowReach.performed += instance.OnShowReach;
+            @ShowReach.canceled += instance.OnShowReach;
         }
 
         private void UnregisterCallbacks(IBuildingSystemActions instance)
@@ -1481,6 +1507,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @DestroyPreview.started -= instance.OnDestroyPreview;
             @DestroyPreview.performed -= instance.OnDestroyPreview;
             @DestroyPreview.canceled -= instance.OnDestroyPreview;
+            @ShowReach.started -= instance.OnShowReach;
+            @ShowReach.performed -= instance.OnShowReach;
+            @ShowReach.canceled -= instance.OnShowReach;
         }
 
         public void RemoveCallbacks(IBuildingSystemActions instance)
@@ -1572,5 +1601,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     {
         void OnPlaceStructure(InputAction.CallbackContext context);
         void OnDestroyPreview(InputAction.CallbackContext context);
+        void OnShowReach(InputAction.CallbackContext context);
     }
 }

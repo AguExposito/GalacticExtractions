@@ -150,20 +150,20 @@ public class BuildingSystem : MonoBehaviour
             currentPreview.GetComponent<SpriteRenderer>().sortingOrder = 20;
 
 
-            LineRenderer border = currentPreview.AddComponent<LineRenderer>();
-            border.useWorldSpace = false;
-            border.startWidth = 0.1f;
-            border.endWidth = 0.1f;
-            border.loop = true;
-            border.positionCount = 4; // 4 esquinas
+            //LineRenderer border = currentPreview.AddComponent<LineRenderer>();
+            //border.useWorldSpace = false;
+            //border.startWidth = 0.1f;
+            //border.endWidth = 0.1f; 
+            //border.loop = true;
+            //border.positionCount = 4; // 4 esquinas
 
-            // Material para que no se vuelva invisible
-            Material lineMaterial = new Material(Shader.Find("Sprites/Default"));
-            border.material = lineMaterial;
-            border.startColor = Color.white;
-            border.endColor = Color.white;
-            border.sortingOrder = 10; // Asegurar que esté visible sobre el sprite
-
+            //// Material para que no se vuelva invisible
+            //Material lineMaterial = new Material(Shader.Find("Sprites/Default"));
+            //border.material = lineMaterial;
+            //border.startColor = Color.white;
+            //border.endColor = Color.white;
+            //border.sortingOrder = 30; // Asegurar que esté visible sobre el sprite
+            currentPreview.GetComponent<LineRenderer>().enabled=true;
             UpdateLineRenderer();
             isPlacing = true;
         }
