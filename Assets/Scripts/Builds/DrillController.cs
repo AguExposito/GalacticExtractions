@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
@@ -11,9 +12,9 @@ public class DrillController : MonoBehaviour
     public float timePerDmgTick= 0.2f;
     public float tubeTime;
     public GameObject drillHead;
-    public GameObject drillTubePivot;
+    public GameObject drillTube;
     Vector3Int nextCellPos;
-    Vector3 initialHeadScale;
+    Vector3 initialHeadPos;
     bool isExtending;
 
     Tilemap oreTilemap;
@@ -26,7 +27,7 @@ public class DrillController : MonoBehaviour
         oreTilemap = GameObject.FindGameObjectWithTag("OreTilemap").GetComponent<Tilemap>();
         wallsTilemap = GameObject.FindGameObjectWithTag("WallsTilemap").GetComponent<Tilemap>();
         damageTile = FindFirstObjectByType<DamageTile>();
-        initialHeadScale = drillHead.transform.localScale;
+        initialHeadPos = drillHead.transform.position;
 
         if (CheckForDrillingSpots() && gameObject.tag=="Building") //Building tag means that is instantiated
         {
@@ -75,6 +76,7 @@ public class DrillController : MonoBehaviour
     }
 
     void ExtendTube() {
+        if (isExtending) return;
         isExtending = true;
         Debug.Log("WaitForTubeExtension");
         StartCoroutine(WaitForTubeExtension());
@@ -94,19 +96,30 @@ public class DrillController : MonoBehaviour
         float totalTime = tubeTime * distance;
         float elapsedTime = 0f;
 
-        Vector3 initialScale = drillTubePivot.transform.localScale;
-        Vector3 targetScale = initialScale + new Vector3(0, distance, 0); // Solo escala en Y
+        Vector3 initialPos = drillHead.transform.position;
+        Vector3 targetPos = initialPos + new Vector3(0, distance, 0); // Solo escala en Y
+
+
+        SpriteRenderer sr = drillTube.GetComponent<SpriteRenderer>();
+        Vector2 srSize = sr.size;
+        float initialTubeHeight = srSize.y;
 
         while (elapsedTime < totalTime)
         {
-            drillTubePivot.transform.localScale = Vector3.Lerp(initialScale, targetScale, elapsedTime / totalTime);
-            drillHead.transform.localScale = new Vector3(drillHead.transform.localScale.x, initialHeadScale.y / drillTubePivot.transform.localScale.y, drillHead.transform.localScale.z);
+            drillHead.transform.position = Vector3.Lerp(initialPos, targetPos, elapsedTime / totalTime);
+
+            float currentHeight = Mathf.Lerp(initialPos.y, targetPos.y, elapsedTime / totalTime);
+            //srSize = new Vector2(srSize.x, Mathf.Abs(currentHeight - initialPos.y)); // Usar la distancia entre la posición inicial y la actual
+            srSize.y = initialTubeHeight+ Mathf.Abs(currentHeight - initialPos.y);
+            sr.size = srSize;
             elapsedTime += Time.deltaTime;
             yield return null; // Espera al siguiente frame
         }
 
         // Asegurar que llegue exactamente a la escala deseada
-        drillTubePivot.transform.localScale = targetScale;
+        drillHead.transform.position = targetPos;
+        srSize.y= initialTubeHeight+Mathf.Abs(targetPos.y - initialPos.y);
+        sr.size = srSize;
         isExtending = false;
         Debug.Log("Finished Smooth Tube Extension");
     }

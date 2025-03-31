@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DrillAnimation
+  m_Name: drillHead
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,13 +21,13 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 21300000, guid: 1c54af2c93830f34788adc30a58c2d0a, type: 3}
+      value: {fileID: 122927169, guid: e78c0f1804ff8c941a65bad8af44db05, type: 3}
     - time: 0.083333336
-      value: {fileID: 21300000, guid: b4277355ef5db534a866578a906c1d35, type: 3}
+      value: {fileID: -1917932466, guid: e78c0f1804ff8c941a65bad8af44db05, type: 3}
     - time: 0.16666667
-      value: {fileID: 21300000, guid: 16020ac93f4d76d41a80e49b4d23d478, type: 3}
+      value: {fileID: -563633322, guid: e78c0f1804ff8c941a65bad8af44db05, type: 3}
     attribute: m_Sprite
-    path: 
+    path: drillTube/drillHead
     classID: 212
     script: {fileID: 0}
     flags: 2
@@ -39,7 +39,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 0
+      path: 701384672
       attribute: 0
       script: {fileID: 0}
       typeID: 212
@@ -48,9 +48,9 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: 21300000, guid: 1c54af2c93830f34788adc30a58c2d0a, type: 3}
-    - {fileID: 21300000, guid: b4277355ef5db534a866578a906c1d35, type: 3}
-    - {fileID: 21300000, guid: 16020ac93f4d76d41a80e49b4d23d478, type: 3}
+    - {fileID: 122927169, guid: e78c0f1804ff8c941a65bad8af44db05, type: 3}
+    - {fileID: -1917932466, guid: e78c0f1804ff8c941a65bad8af44db05, type: 3}
+    - {fileID: -563633322, guid: e78c0f1804ff8c941a65bad8af44db05, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}

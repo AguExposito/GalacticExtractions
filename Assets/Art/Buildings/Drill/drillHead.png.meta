@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: 0aa14b9e2149f4549adeb8865e4adeaa
+guid: e78c0f1804ff8c941a65bad8af44db05
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7928368094607498982
-    second: drillBody_0
+      213: 2898157411391485853
+    second: 1743384053839_0
+  - first:
+      213: -3328341791700793489
+    second: 1743384053839_1
+  - first:
+      213: -1336955653820502178
+    second: 1743384053839_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +52,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 1610
+  spritePixelsToUnits: 2000
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -139,23 +145,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: drillBody_0
+      name: drillHead_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 279
         y: 0
-        width: 1600
-        height: 1600
+        width: 1488
+        height: 1984
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 6eede9796c8370e60800000000000000
-      internalID: 7928368094607498982
+      spriteID: 8e9d5c228f4d5a94db4748a48a327e2d
+      internalID: 122927169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: drillHead_1
+      rect:
+        serializedVersion: 2
+        x: 2232
+        y: 0
+        width: 1535
+        height: 1984
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8fdb718810ece2045985270fede61037
+      internalID: -1917932466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: drillHead_2
+      rect:
+        serializedVersion: 2
+        x: 4232
+        y: 0
+        width: 1534
+        height: 1984
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52c1b10a98991ce46afe01bd0c53ced5
+      internalID: -563633322
       vertices: []
       indices: 
       edges: []
@@ -164,7 +214,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 7b380cc3fd66bd745961ea58f31a89be
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +224,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      drillBody_0: 7928368094607498982
+      drillHead_0: 122927169
+      drillHead_1: -1917932466
+      drillHead_2: -563633322
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
