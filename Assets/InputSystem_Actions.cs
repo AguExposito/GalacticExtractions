@@ -1043,6 +1043,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RotatePreview"",
+                    ""type"": ""Value"",
+                    ""id"": ""97732bc3-8024-4844-b49b-825b2927dbdf"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -1078,6 +1087,39 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""ShowReach"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""b87463f9-868a-4645-a679-b92010ba3105"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotatePreview"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""2904bf3a-080d-407c-a2d0-45489ef85cb3"",
+                    ""path"": ""<Mouse>/scroll/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotatePreview"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""231ed526-7f4c-4066-bd80-e1a082e62dc1"",
+                    ""path"": ""<Mouse>/scroll/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotatePreview"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -1173,6 +1215,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_BuildingSystem_PlaceStructure = m_BuildingSystem.FindAction("PlaceStructure", throwIfNotFound: true);
         m_BuildingSystem_DestroyPreview = m_BuildingSystem.FindAction("DestroyPreview", throwIfNotFound: true);
         m_BuildingSystem_ShowReach = m_BuildingSystem.FindAction("ShowReach", throwIfNotFound: true);
+        m_BuildingSystem_RotatePreview = m_BuildingSystem.FindAction("RotatePreview", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1472,6 +1515,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_BuildingSystem_PlaceStructure;
     private readonly InputAction m_BuildingSystem_DestroyPreview;
     private readonly InputAction m_BuildingSystem_ShowReach;
+    private readonly InputAction m_BuildingSystem_RotatePreview;
     public struct BuildingSystemActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1479,6 +1523,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @PlaceStructure => m_Wrapper.m_BuildingSystem_PlaceStructure;
         public InputAction @DestroyPreview => m_Wrapper.m_BuildingSystem_DestroyPreview;
         public InputAction @ShowReach => m_Wrapper.m_BuildingSystem_ShowReach;
+        public InputAction @RotatePreview => m_Wrapper.m_BuildingSystem_RotatePreview;
         public InputActionMap Get() { return m_Wrapper.m_BuildingSystem; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1497,6 +1542,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ShowReach.started += instance.OnShowReach;
             @ShowReach.performed += instance.OnShowReach;
             @ShowReach.canceled += instance.OnShowReach;
+            @RotatePreview.started += instance.OnRotatePreview;
+            @RotatePreview.performed += instance.OnRotatePreview;
+            @RotatePreview.canceled += instance.OnRotatePreview;
         }
 
         private void UnregisterCallbacks(IBuildingSystemActions instance)
@@ -1510,6 +1558,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ShowReach.started -= instance.OnShowReach;
             @ShowReach.performed -= instance.OnShowReach;
             @ShowReach.canceled -= instance.OnShowReach;
+            @RotatePreview.started -= instance.OnRotatePreview;
+            @RotatePreview.performed -= instance.OnRotatePreview;
+            @RotatePreview.canceled -= instance.OnRotatePreview;
         }
 
         public void RemoveCallbacks(IBuildingSystemActions instance)
@@ -1602,5 +1653,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnPlaceStructure(InputAction.CallbackContext context);
         void OnDestroyPreview(InputAction.CallbackContext context);
         void OnShowReach(InputAction.CallbackContext context);
+        void OnRotatePreview(InputAction.CallbackContext context);
     }
 }

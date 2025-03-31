@@ -80,7 +80,7 @@ public class DrillController : MonoBehaviour
     bool CheckForDrillingSpots() {
         for (int i = 0; i < cellsToDrill; i++)
         {
-            Vector3Int cellPosition = oreTilemap.WorldToCell(drillHead.transform.position)+Vector3Int.up*i;
+            Vector3Int cellPosition = oreTilemap.WorldToCell(drillHead.transform.position)+GetDrillDirection()*i;
             if (oreTilemap.HasTile(cellPosition) || wallsTilemap.HasTile(cellPosition)) {
                 cellsToDrill-=i;
                 nextCellPos = cellPosition;
@@ -88,6 +88,17 @@ public class DrillController : MonoBehaviour
             }
         }
         return false;
+    }
+    Vector3Int GetDrillDirection()
+    {
+        float angle = transform.eulerAngles.z;
+
+        if (angle >= 315 || angle < 45) return Vector3Int.up;      // Apunta hacia arriba
+        if (angle >= 45 && angle < 135) return Vector3Int.left;    // Apunta hacia la izquierda
+        if (angle >= 135 && angle < 225) return Vector3Int.down;    // Apunta hacia abajo
+        if (angle >= 225 && angle < 315) return Vector3Int.right;   // Apunta hacia la derecha
+
+        return Vector3Int.up; // Valor por defecto
     }
 
     void ExtendTube() {
@@ -100,7 +111,9 @@ public class DrillController : MonoBehaviour
     IEnumerator WaitForTubeExtension()
     {
         Vector3Int cellPosition = oreTilemap.WorldToCell(drillHead.transform.position);
-        int distance = (int)Mathf.Abs(cellPosition.y - nextCellPos.y);
+        int distance = (int)Vector3.Distance( cellPosition, nextCellPos);
+
+        Vector3Int drillDir = GetDrillDirection();
 
         if (distance == 0) {
             isExtending = false; 
@@ -111,7 +124,7 @@ public class DrillController : MonoBehaviour
         float totalTime = tubeTime * distance;
         float elapsedTime = 0f;
 
-        Vector3 initialPos = drillHead.transform.position;
+        Vector3 initialPos = drillHead.transform.localPosition;
         Vector3 targetPos = initialPos + new Vector3(0, distance, 0); // Solo escala en Y
 
 
@@ -121,10 +134,9 @@ public class DrillController : MonoBehaviour
 
         while (elapsedTime < totalTime)
         {
-            drillHead.transform.position = Vector3.Lerp(initialPos, targetPos, elapsedTime / totalTime);
+            drillHead.transform.localPosition = Vector3.Lerp(initialPos, targetPos, elapsedTime / totalTime);
 
             float currentHeight = Mathf.Lerp(initialPos.y, targetPos.y, elapsedTime / totalTime);
-            //srSize = new Vector2(srSize.x, Mathf.Abs(currentHeight - initialPos.y)); // Usar la distancia entre la posición inicial y la actual
             srSize.y = initialTubeHeight+ Mathf.Abs(currentHeight - initialPos.y);
             sr.size = srSize;
             elapsedTime += Time.deltaTime;
@@ -132,7 +144,7 @@ public class DrillController : MonoBehaviour
         }
 
         // Asegurar que llegue exactamente a la escala deseada
-        drillHead.transform.position = targetPos;
+        drillHead.transform.localPosition = targetPos;
         srSize.y= initialTubeHeight+Mathf.Abs(targetPos.y - initialPos.y);
         sr.size = srSize;
         isExtending = false;
@@ -171,7 +183,7 @@ public class DrillController : MonoBehaviour
         //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
         {
-            if (effectReach != null && UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count>2)
+            if (effectReach != null && UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count>=2)
                 effectReach.SetActive(true);
         };
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp += finger =>
@@ -200,7 +212,7 @@ public class DrillController : MonoBehaviour
         //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= finger =>
         {
-            if (effectReach != null && UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count > 2)
+            if (effectReach != null && UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
                 effectReach.SetActive(true);
         };
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp -= finger =>

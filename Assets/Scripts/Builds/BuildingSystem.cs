@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -42,6 +43,7 @@ public class BuildingSystem : MonoBehaviour
             }
         };
         controls.BuildingSystem.DestroyPreview.performed += ctx => DestroyPreview();
+        controls.BuildingSystem.RotatePreview.performed += ctx => RotatePreview();
 
         //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
@@ -52,7 +54,7 @@ public class BuildingSystem : MonoBehaviour
         };
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp += finger =>
         {
-            if (canPlace && !!touchOverUI)
+            if (canPlace && !touchOverUI)
             {
                 TryPlaceStructure();
             }
@@ -62,6 +64,7 @@ public class BuildingSystem : MonoBehaviour
             }
         };
     }
+
 
     void OnDisable() 
     { 
@@ -86,7 +89,7 @@ public class BuildingSystem : MonoBehaviour
         };
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp -= finger =>
         {
-            if (canPlace && !!touchOverUI)
+            if (canPlace && !touchOverUI)
             {
                 TryPlaceStructure();
             }
@@ -135,6 +138,31 @@ public class BuildingSystem : MonoBehaviour
         }
 
     }
+    private void RotatePreview()
+    {
+        if (currentPreview == null) return;
+
+        float currentRotation = currentPreview.transform.eulerAngles.z; // Obtiene la rotación en Z
+
+        float rotationStep = 90f; // Rotar en pasos de 90°
+        float newRotation;
+
+        if (controls.BuildingSystem.RotatePreview.ReadValue<float>() > 0)
+        {
+            newRotation = Mathf.Repeat(currentRotation + rotationStep, 360); // Asegura que esté en 0-360°
+        }
+        else if (controls.BuildingSystem.RotatePreview.ReadValue<float>() < 0)
+        {
+            newRotation = Mathf.Repeat(currentRotation - rotationStep, 360); // Asegura que esté en 0-360°
+        }
+        else
+        {
+            return; // No hay cambio
+        }
+
+        currentPreview.transform.rotation = Quaternion.Euler(0, 0, newRotation); // Aplica la rotación en Z
+    }
+
 
     public void SelectStructure(GameObject selectedStructure)
     {
@@ -149,20 +177,6 @@ public class BuildingSystem : MonoBehaviour
             currentPreview.GetComponent<SpriteRenderer>().color = validColor;
             currentPreview.GetComponent<SpriteRenderer>().sortingOrder = 20;
 
-
-            //LineRenderer border = currentPreview.AddComponent<LineRenderer>();
-            //border.useWorldSpace = false;
-            //border.startWidth = 0.1f;
-            //border.endWidth = 0.1f; 
-            //border.loop = true;
-            //border.positionCount = 4; // 4 esquinas
-
-            //// Material para que no se vuelva invisible
-            //Material lineMaterial = new Material(Shader.Find("Sprites/Default"));
-            //border.material = lineMaterial;
-            //border.startColor = Color.white;
-            //border.endColor = Color.white;
-            //border.sortingOrder = 30; // Asegurar que esté visible sobre el sprite
             currentPreview.GetComponent<LineRenderer>().enabled=true;
             UpdateLineRenderer();
             isPlacing = true;
@@ -242,10 +256,12 @@ public class BuildingSystem : MonoBehaviour
         if (currentPreview != null && canPlace)
         {
             GameObject building = Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
-            Destroy(currentPreview);
-            isPlacing = false;
+            building.transform.rotation = currentPreview.transform.rotation;
             building.GetComponent<Collider2D>().enabled = true;
             building.tag = "Building";
+
+            Destroy(currentPreview);
+            isPlacing = false;
         }
     }
     Vector3 GetMouseOrTouchPosition()
