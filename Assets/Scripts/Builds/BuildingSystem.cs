@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -15,6 +12,7 @@ public class BuildingSystem : MonoBehaviour
     public Transform previewParent; // Parent para manejar la preview
     public Color validColor = new Color(0, 1, 0, 0.5f);
     public Color invalidColor = new Color(1, 0, 0, 0.5f);
+    public RadialMenuController radialMenu;
 
     private GameObject currentPreview;
     private Vector3Int cellPosition;
@@ -24,12 +22,12 @@ public class BuildingSystem : MonoBehaviour
     InputSystem_Actions controls;
     int fingerIndex;
     bool touchOverUI = false;
+    Vector3 lastTocuhPosition;
     private void Awake()
     {
         // Aseguramos que el sistema de input esté inicializado antes de usarlo
         controls = new InputSystem_Actions();
         EnhancedTouchSupport.Enable();
-        
     }
     void OnEnable() 
     { 
@@ -47,51 +45,17 @@ public class BuildingSystem : MonoBehaviour
         controls.BuildingSystem.RotatePreview.performed += ctx => RotatePreview();
         controls.BuildingSystem.ShowReach.performed += ctx =>
         {
-            EnableLR(true);
+            EnableLR();
         }; 
-        controls.BuildingSystem.ShowReach.canceled += ctx =>
-        {
-            EnableLR(false);
-        };
 
         //Android
-
-        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += HandleFingerDown;
-        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp += finger =>
-        {
-
-            if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
-            {
-                RotatePreview();
-            }
-            else
-            {
-
-                if (canPlace && !touchOverUI)
-                {
-                    TryPlaceStructure();
-                }
-                else
-                {
-                    DestroyPreview();
-                }
-            }
-
-            EnableLR(false);
-        };
-        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove += finger =>
-        {
-            EnableLR(true);
-        };
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove += HandleFingerDown;
 
     }
-
 
     void OnDisable() 
     { 
         controls.Disable();
-
-
         //PC
         controls.BuildingSystem.PlaceStructure.performed -= ctx =>
         {
@@ -104,55 +68,28 @@ public class BuildingSystem : MonoBehaviour
         controls.BuildingSystem.RotatePreview.performed -= ctx => RotatePreview();
         controls.BuildingSystem.ShowReach.performed -= ctx =>
         {
-            EnableLR(true);
-        };
-        controls.BuildingSystem.ShowReach.canceled -= ctx =>
-        {
-            EnableLR(false);
+            EnableLR();
         };
 
         //Android
-
-        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= HandleFingerDown;
-        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerUp -= finger =>
-        {
-            if (canPlace && !touchOverUI)
-            {
-                TryPlaceStructure();
-            }
-            else
-            {
-                DestroyPreview();
-            }
-
-            if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
-            {
-                RotatePreview();
-            }
-            EnableLR(false);
-        };
-        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove -= finger =>
-        {
-            EnableLR(true);
-        };
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove -= HandleFingerDown;
     }
     private void HandleFingerDown(Finger finger)
     {
         // Verifica si el toque está sobre UI
         touchOverUI = IsTouchOverUI(finger.screenPosition);
         Debug.Log("Touch Over UI: " + touchOverUI);
-
-        if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches.Count >= 2)
-        {
-            EnableLR(true);
-        }
+        if (!touchOverUI) { lastTocuhPosition = finger.screenPosition; }
+        PositioningBuilding();
     }
-    void EnableLR(bool state) {
+    bool state;
+    void EnableLR() {
         GameObject[] go = GameObject.FindGameObjectsWithTag("EffectReach");
         foreach (GameObject gameObject in go)
         {
             gameObject.GetComponent<LineRenderer>().enabled = state;
         }
+        state = !state;
         Debug.Log("ShowStarted " + go.Length);
     }
     private bool IsTouchOverUI(Vector2 touchPosition)
@@ -168,16 +105,11 @@ public class BuildingSystem : MonoBehaviour
     void Update()
     {
         if (!isPlacing) { return; }
-
-
-        Vector3 worldPosition = GetMouseOrTouchPosition();
-        worldPosition.z = 0;
-        cellPosition = groundTilemap.WorldToCell(worldPosition);
-        Vector3 snappedPosition = groundTilemap.GetCellCenterWorld(cellPosition);
-
+#if !PLATFORM_ANDROID
+        PositioningBuilding();
+#endif
         if (currentPreview != null)
         {
-            currentPreview.transform.position = snappedPosition;
             canPlace = ValidatePosition() && ValidatePositionBuilding();
 
             UpdateLineRenderer(); 
@@ -188,10 +120,23 @@ public class BuildingSystem : MonoBehaviour
             ln.endColor = canPlace ? validColor : invalidColor;
             sr.color = canPlace? validColor : invalidColor;
         }
-        
     }
+    public void PositioningBuilding()
+    {
+        Vector3 worldPosition;
+        worldPosition = GetMouseOrTouchPosition();
+        worldPosition.z = 0;
 
-    private void DestroyPreview()
+
+        cellPosition = groundTilemap.WorldToCell(worldPosition);
+        Vector3 snappedPosition = groundTilemap.GetCellCenterWorld(cellPosition);
+
+        if (currentPreview != null)
+        {
+            currentPreview.transform.position = snappedPosition;
+        }
+    }
+    public void DestroyPreview()
     {
         if (currentPreview != null)
         {
@@ -201,15 +146,15 @@ public class BuildingSystem : MonoBehaviour
         }
 
     }
-    private void RotatePreview()
+    public void RotatePreview()
     {
         if (currentPreview == null) return;
 
         float currentRotation = currentPreview.transform.eulerAngles.z; // Obtiene la rotación en Z
 
         float rotationStep = 90f; // Rotar en pasos de 90°
-        float newRotation;
-
+        float newRotation=0;
+#if !PLATFORM_ANDROID
         if (controls.BuildingSystem.RotatePreview.ReadValue<float>() > 0)
         {
             newRotation = Mathf.Repeat(currentRotation + rotationStep, 360); // Asegura que esté en 0-360°
@@ -218,15 +163,12 @@ public class BuildingSystem : MonoBehaviour
         {
             newRotation = Mathf.Repeat(currentRotation - rotationStep, 360); // Asegura que esté en 0-360°
         }
-        else if (Application.isMobilePlatform)
-        {
-            newRotation = Mathf.Repeat(currentRotation + rotationStep, 360); // Asegura que esté en 0-360°
-        }
-        else {
-            return; // No hay cambio
-        }
-
+#else
+        newRotation = Mathf.Repeat(currentRotation - rotationStep, 360); // Asegura que esté en 0-360°
+        
+#endif
         currentPreview.transform.rotation = Quaternion.Euler(0, 0, newRotation); // Aplica la rotación en Z
+        radialMenu.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
 
@@ -236,13 +178,16 @@ public class BuildingSystem : MonoBehaviour
         {
             if (currentPreview != null)
             {
-                Destroy(currentPreview);
+                DestroyPreview();
             }
             this.selectedStructure = selectedStructure;
             currentPreview = Instantiate(selectedStructure, previewParent);
             currentPreview.GetComponent<SpriteRenderer>().color = validColor;
             currentPreview.GetComponent<SpriteRenderer>().sortingOrder = 20;
-
+#if PLATFORM_ANDROID
+            radialMenu.ReparentAndResize(currentPreview.transform);
+            radialMenu.gameObject.SetActive(true);
+#endif
             currentPreview.GetComponent<LineRenderer>().enabled=true;
             UpdateLineRenderer();
             isPlacing = true;
@@ -317,8 +262,9 @@ public class BuildingSystem : MonoBehaviour
         return true;
     }
 
-    void TryPlaceStructure()
+    public void TryPlaceStructure()
     {
+
         if (currentPreview != null && canPlace)
         {
             GameObject building = Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
@@ -326,27 +272,32 @@ public class BuildingSystem : MonoBehaviour
             building.GetComponent<Collider2D>().enabled = true;
             building.tag = "Building";
 
-            Destroy(currentPreview);
-            isPlacing = false;
+            DestroyPreview();
         }
     }
     Vector3 GetMouseOrTouchPosition()
     {
-        if (Touchscreen.current != null && (Touchscreen.current.primaryTouch.press.isPressed || Touchscreen.current.primaryTouch.press.wasReleasedThisFrame))
+#if PLATFORM_ANDROID
+        if (lastTocuhPosition == null)
         {
-            return Camera.main.ScreenToWorldPoint(Touchscreen.current.primaryTouch.position.ReadValue());
+            return Vector3.zero;
         }
-            
+        return Camera.main.ScreenToWorldPoint(lastTocuhPosition);
+#else
         return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+#endif
     }
     Vector2 GetMouseOrTouchPosition2D()
     {
-        if (Touchscreen.current != null && (Touchscreen.current.primaryTouch.press.isPressed || Touchscreen.current.primaryTouch.press.wasReleasedThisFrame))
+#if PLATFORM_ANDROID
+        if (Application.isMobilePlatform && lastTocuhPosition == null)
         {
-            return Camera.main.ScreenToWorldPoint(Touchscreen.current.primaryTouch.position.ReadValue());
+            return Vector3.zero;
         }
-
+        return Camera.main.ScreenToWorldPoint(lastTocuhPosition);
+#else
         return Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+#endif
     }
 
 }
