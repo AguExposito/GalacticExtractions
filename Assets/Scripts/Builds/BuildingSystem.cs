@@ -50,6 +50,7 @@ public class BuildingSystem : MonoBehaviour
 
         //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove += HandleFingerDown;
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += HandleFingerDown;
 
     }
 
@@ -73,17 +74,21 @@ public class BuildingSystem : MonoBehaviour
 
         //Android
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove -= HandleFingerDown;
+        UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= HandleFingerDown;
     }
     private void HandleFingerDown(Finger finger)
     {
         // Verifica si el toque está sobre UI
         touchOverUI = IsTouchOverUI(finger.screenPosition);
         Debug.Log("Touch Over UI: " + touchOverUI);
-        if (!touchOverUI) { lastTocuhPosition = finger.screenPosition; }
-        PositioningBuilding();
+        if (!touchOverUI)
+        {
+            lastTocuhPosition = finger.screenPosition;
+            PositioningBuilding();
+        }
     }
-    bool state;
-    void EnableLR() {
+    bool state=true;
+    public void EnableLR() {
         GameObject[] go = GameObject.FindGameObjectsWithTag("EffectReach");
         foreach (GameObject gameObject in go)
         {
@@ -138,6 +143,10 @@ public class BuildingSystem : MonoBehaviour
     }
     public void DestroyPreview()
     {
+#if PLATFORM_ANDROID
+        radialMenu.gameObject.SetActive(false);
+        radialMenu.ReparentAndResize(null);
+#endif
         if (currentPreview != null)
         {
             Destroy(currentPreview);

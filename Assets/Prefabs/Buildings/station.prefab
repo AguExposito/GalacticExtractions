@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4709269449806653618}
   - component: {fileID: 1074123086651248231}
   - component: {fileID: 6069963035726388431}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: station
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,7 +280,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5270265173858728782}
   - component: {fileID: 6444818325540275866}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: EffectReach
   m_TagString: EffectReach
   m_Icon: {fileID: 0}
