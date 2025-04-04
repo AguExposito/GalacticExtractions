@@ -5,8 +5,10 @@ using System.Collections.Generic;
 
 public class StationController : MonoBehaviour
 {
-    public int squareRangeX = 13;
-    public int squareRangeY = 13;
+    public bool hasEnergy = false;
+    public bool hasStorage = false;
+    public float squareRangeX = 13;
+    public float squareRangeY = 13;
     Vector2 size;
     public GameObject effectRange;
     public Material storeCable;
@@ -53,32 +55,50 @@ public class StationController : MonoBehaviour
         Collider2D[] colliders = Physics2D.OverlapBoxAll(effectRange.transform.position,size,0f,buildingsLayerMask);
         foreach (Collider2D collider in colliders)
         {
-            if (collider.gameObject == gameObject || collider.transform.parent.gameObject == gameObject) continue; // No conectar consigo mismo
-
-            // Crear un nuevo objeto para la conexión
-            GameObject lrContainer = new GameObject("ConnectionLine");
-            lrContainer.transform.SetParent(transform);
-
-            LineRenderer lr = lrContainer.AddComponent<LineRenderer>();
-            lr.startWidth = 0.15f;
-            lr.endWidth = 0.15f;
-            lr.material = storeCable;
-            lr.sortingOrder = 10;
-            lr.positionCount = 2;
-
-            // Definir los puntos de conexión
-            Vector3[] points = new Vector3[]
-            {
-                transform.position,
-                collider.gameObject.transform.position
-            };
-            lr.SetPositions(points);
-
-            // Guardar la conexión en la lista
-            connections.Add(lrContainer);
+            CreateNewConnection(collider);
+            DefineVariableStates(collider);
         }
 
     }
+
+    public void CreateNewConnection(Collider2D collider)
+    {
+        if (collider.gameObject == gameObject || collider.transform.parent.gameObject == gameObject) return; // No conectar consigo mismo
+
+        // Crear un nuevo objeto para la conexión
+        GameObject lrContainer = new GameObject("ConnectionLine");
+        lrContainer.transform.SetParent(transform);
+
+        LineRenderer lr = lrContainer.AddComponent<LineRenderer>();
+        lr.startWidth = 0.15f;
+        lr.endWidth = 0.15f;
+        lr.material = storeCable;
+        lr.sortingOrder = 8;
+        lr.positionCount = 2;
+
+        // Definir los puntos de conexión
+        Vector3[] points = new Vector3[]
+        {
+                transform.position,
+                collider.gameObject.transform.position
+        };
+        lr.SetPositions(points);
+
+        // Guardar la conexión en la lista
+        connections.Add(lrContainer);
+    }
+
+    private void DefineVariableStates(Collider2D collider)
+    {
+        switch (collider.tag)
+        {
+            case "EnergyStorage": { hasEnergy = true; hasStorage = true; } break;
+            case "Storage": { hasStorage = true; } break;
+            case "Energy": { hasEnergy = true; } break;
+            default: { } break;
+        }
+    }
+
     void ClearConnections()
     {
         foreach (GameObject connection in connections)

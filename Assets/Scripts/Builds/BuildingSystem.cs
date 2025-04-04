@@ -95,7 +95,6 @@ public class BuildingSystem : MonoBehaviour
             gameObject.GetComponent<LineRenderer>().enabled = state;
         }
         state = !state;
-        Debug.Log("ShowStarted " + go.Length);
     }
     private bool IsTouchOverUI(Vector2 touchPosition)
     {
@@ -200,6 +199,10 @@ public class BuildingSystem : MonoBehaviour
             currentPreview.GetComponent<LineRenderer>().enabled=true;
             UpdateLineRenderer();
             isPlacing = true;
+
+            //Se llama 2 veces para refrescar sin que cambie el estado
+            EnableLR();
+            EnableLR();
         }
     }
     void UpdateLineRenderer() {
@@ -279,9 +282,12 @@ public class BuildingSystem : MonoBehaviour
             GameObject building = Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
             building.transform.rotation = currentPreview.transform.rotation;
             building.GetComponent<Collider2D>().enabled = true;
-            building.tag = "Building";
 
             DestroyPreview();
+
+            //Se llama 2 veces para refrescar sin que cambie el estado
+            EnableLR();
+            EnableLR();
         }
     }
     Vector3 GetMouseOrTouchPosition()

@@ -54,16 +54,6 @@ public class RadialMenuController : MonoBehaviour
     public void ReparentAndResize(Transform tr) { 
         transform.parent.SetParent(tr);
         transform.parent.localPosition=Vector3.zero;
-        //int largestAxis;
-        //if (tr != null)
-        //{
-        //    largestAxis = (int)Mathf.Max(tr.localScale.x, tr.localScale.y);
-        //}
-        //else
-        //{
-        //    largestAxis = 0;
-        //}
-        //multiplier = largestAxis;
 
     }
 }

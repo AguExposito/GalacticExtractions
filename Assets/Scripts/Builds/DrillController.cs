@@ -6,6 +6,10 @@ using UnityEngine.Tilemaps;
 
 public class DrillController : MonoBehaviour
 {
+    public bool hasEnergy=false;
+    public bool hasStorage=false;
+    public float searchRadius = 10f; // o lo que sea razonable
+    [Space]
     public int cellsToDrill = 10;
     public int extractionDamage = 10;
     public float timePerDmgTick = 0.2f;
@@ -27,6 +31,7 @@ public class DrillController : MonoBehaviour
         // Aseguramos que el sistema de input esté inicializado antes de usarlo
         controls = new InputSystem_Actions();
         EnhancedTouchSupport.Enable();
+
         Vector3[] corners = new Vector3[]
         {
             new Vector3(-0.5f,-0.5f,0),//BL
@@ -35,6 +40,8 @@ public class DrillController : MonoBehaviour
             new Vector3(-0.5f,0.5f+cellsToDrill,0),//TL
         };
         effectReach.GetComponent<LineRenderer>().SetPositions(corners);
+
+        TryConnectToNearbyStations();
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -166,5 +173,32 @@ public class DrillController : MonoBehaviour
             yield return new WaitForSeconds(timePerTick); // Espera antes de aplicar el siguiente daño
         }
 
+    }
+
+    void TryConnectToNearbyStations()
+    {
+        int stationLayerMask = 1 << 8; // Asumimos que las estaciones también están en BuildingsLayer
+
+        Collider2D[] nearbyColliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(searchRadius,searchRadius),0f, stationLayerMask);
+
+        foreach (Collider2D col in nearbyColliders)
+        {
+            if (col.gameObject == gameObject || col.transform.parent.gameObject == gameObject) continue; // No conectar consigo mismo
+            if (col.TryGetComponent<StationController>(out StationController stationController))
+            {
+                stationController.CreateNewConnection(gameObject.GetComponent<Collider2D>()); // se le pasa el collider del gameobject así la estaicon hace la conexión correspondiente
+            }
+            DefineVariableStates(col);
+        }
+    }
+    private void DefineVariableStates(Collider2D collider)
+    {
+        switch (collider.tag)
+        {
+            case "EnergyStorage": { hasEnergy = true; hasStorage = true; } break;
+            case "Storage": { hasStorage = true; } break;
+            case "Energy": { hasEnergy = true; } break;
+            default: { Debug.Log("No coincidio con los tags definidos "+collider.tag); } break;
+        }
     }
 }

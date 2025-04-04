@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6069963035726388431}
   m_Layer: 8
   m_Name: station
-  m_TagString: Untagged
+  m_TagString: EnergyStorage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 11
   m_Sprite: {fileID: 21300000, guid: 96f793fd407e2064983316b2416f06d9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -135,7 +135,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.9, y: 0.9}
   m_EdgeRadius: 0
 --- !u!120 &1074123086651248231
 LineRenderer:
@@ -267,9 +267,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0200873b71eb69499aafce52945c31a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hasEnergy: 0
+  hasStorage: 0
   squareRangeX: 13
   squareRangeY: 13
   effectRange: {fileID: 4956008948219910704}
+  storeCable: {fileID: 2100000, guid: 9b1ee60fa16cf9649b731c7169808deb, type: 2}
+  connections: []
 --- !u!1 &4956008948219910704
 GameObject:
   m_ObjectHideFlags: 0
