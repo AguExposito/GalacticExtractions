@@ -561,7 +561,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07f0ed5efc87f9488bf4c1734f60df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectionMats: []
+  connectionMat:
+  - Key: 0
+    Value: {fileID: 2100000, guid: 920fd7b26753432468354a6ddf9161f4, type: 2}
+  - Key: 1
+    Value: {fileID: 2100000, guid: f402a976b32578b4f8e3422cde555eae, type: 2}
+  - Key: 2
+    Value: {fileID: 2100000, guid: 9b1ee60fa16cf9649b731c7169808deb, type: 2}
+  - Key: 3
+    Value: {fileID: 2100000, guid: 339bed755a081f14cb810c5294c652d4, type: 2}
 --- !u!1 &99442480
 GameObject:
   m_ObjectHideFlags: 0

@@ -83,18 +83,6 @@ public class StationController : Building
         connections.Add(lrContainer);
     }
 
-    private void DefineVariableStates(Collider2D collider)
-    {
-        
-        switch (collider.tag)
-        {
-            case "EnergyStorage": { hasEnergy = true; hasStorage = true; } break;
-            case "Storage": { hasStorage = true; } break;
-            case "Energy": { hasEnergy = true; } break;
-            default: { Debug.Log("No coincidio con los tags definidos " + collider.tag); } break;
-        }
-    }
-
     void ClearConnections()
     {
         foreach (GameObject connection in connections)

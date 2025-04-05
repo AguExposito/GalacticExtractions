@@ -270,8 +270,6 @@ MonoBehaviour:
   hasEnergy: 0
   hasStorage: 0
   searchRadius: {x: 13, y: 13}
-  squareRangeX: 13
-  squareRangeY: 13
   effectRange: {fileID: 4956008948219910704}
   storeCable: {fileID: 2100000, guid: 9b1ee60fa16cf9649b731c7169808deb, type: 2}
   connections: []
@@ -285,7 +283,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5270265173858728782}
   - component: {fileID: 6444818325540275866}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: EffectReach
   m_TagString: EffectReach
   m_Icon: {fileID: 0}

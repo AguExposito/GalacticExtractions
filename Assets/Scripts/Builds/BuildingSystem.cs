@@ -260,11 +260,10 @@ public class BuildingSystem : MonoBehaviour
 
         Vector2 size = currentPreview.transform.localScale - new Vector3(1,1,0); 
         Collider2D[] colliders = Physics2D.OverlapBoxAll(mousePosition, size, 0f);
-
         // Recorremos todos los colliders que hemos detectado
         foreach (Collider2D collider in colliders)
         {
-            if (collider.CompareTag("Building") || collider.CompareTag("Player"))
+            if ( collider.gameObject.layer==8|| collider.CompareTag("Player"))
             {
                 Debug.Log("Se ha detectado un objeto 'Building' en la posición del mouse");
                 return false;

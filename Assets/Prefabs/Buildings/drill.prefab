@@ -153,8 +153,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasEnergy: 0
   hasStorage: 0
-  searchRadiusX: 10
-  searchRadiusY: 10
   searchRadius: {x: 11, y: 11}
   cellsToDrill: 10
   extractionDamage: 5
@@ -314,7 +312,7 @@ GameObject:
   m_Component:
   - component: {fileID: 161005896799947397}
   - component: {fileID: 1106731967462765935}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: drillHead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -401,7 +399,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7796301041861165630}
   - component: {fileID: 7021086212638898598}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: EffectReach
   m_TagString: EffectReach
   m_Icon: {fileID: 0}
@@ -551,7 +549,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7888816062288301841}
   - component: {fileID: 8767143355609943538}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: drillTube
   m_TagString: Untagged
   m_Icon: {fileID: 0}

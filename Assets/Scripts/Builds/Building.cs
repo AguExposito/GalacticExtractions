@@ -5,7 +5,7 @@ public class Building : MonoBehaviour
     public bool hasEnergy = false;
     public bool hasStorage = false;
     public Vector2 searchRadius = new Vector2();
-    private void DefineVariableStates(Collider2D collider)
+    public void DefineVariableStates(Collider2D collider)
     {
         switch (collider.tag)
         {
