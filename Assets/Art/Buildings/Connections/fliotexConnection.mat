@@ -45,7 +45,7 @@ Material:
     m_Floats: []
     m_Colors:
     - _Color1: {r: 1, g: 1, b: 1, a: 1}
-    - _Speed: {r: 1, g: -2, b: 0, a: 0}
+    - _Speed: {r: 1, g: 2, b: 0, a: 0}
     - _TextureColor: {r: 0.6754716, g: 0.6754716, b: 0.6754716, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

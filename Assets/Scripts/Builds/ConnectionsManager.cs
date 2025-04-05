@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,9 +62,9 @@ public class ConnectionsManager : MonoBehaviour
 {
     public List<KeyValuePairSerializable<OreNames,Material>> connectionMat = new List<KeyValuePairSerializable<OreNames,Material>>();
     public List<KeyValuePairSerializable<GameObject,GameObject>> drillStationConnections = new List<KeyValuePairSerializable<GameObject, GameObject>>();
+    public List<GameObject> connections;
 
-
-    public void CreateNewConnection(Collider2D collider, GameObject currentGO, OreNames ore)
+    public void CreateNewConnection(Collider2D collider, GameObject currentGO, OreNames ore, bool isInverse =false)
     {
 
         // Crear un nuevo objeto para la conexión
@@ -75,15 +76,28 @@ public class ConnectionsManager : MonoBehaviour
         lr.endWidth = 0.15f;
         lr.sortingOrder = 8;
         lr.positionCount = 2;
-        lr.material = connectionMat[0].Value; 
+        lr.material = connectionMat[0].Value;
 
         // Definir los puntos de conexión
-        Vector3[] points = new Vector3[]
+
+        Vector3[] points;
+        if (isInverse) {
+            points= new Vector3[]
+            {
+                    currentGO.transform.position,
+                    collider.gameObject.transform.position
+            };
+        }
+        else
         {
-                currentGO.transform.position,
-                collider.gameObject.transform.position
-        };
-        lr.SetPositions(points);
+            points = new Vector3[]
+            {
+                    collider.gameObject.transform.position,
+                    currentGO.transform.position
+            };
+
+        }
+            lr.SetPositions(points);
 
         // Guardar la conexión nueva en la lista
         KeyValuePairSerializable<GameObject, GameObject> newConnection = new KeyValuePairSerializable<GameObject, GameObject>(collider.gameObject, lrContainer);
@@ -94,45 +108,50 @@ public class ConnectionsManager : MonoBehaviour
         AssignConnectionMaterial(ore, lrContainer);
     }
 
-    public void AssignConnectionMaterial(OreNames ore, GameObject lrContainer)
+    public void AssignConnectionMaterial(OreNames ore, GameObject structure)
     {
-        List<GameObject> connections = GetAllConnections(lrContainer);
-        //Asignar material
-        foreach (KeyValuePairSerializable<OreNames, Material> kvpCM in connectionMat)
+        Material mat = connectionMat.Find(kvp => kvp.Key.Equals(ore))?.Value;
+        if (mat == null) return;
+
+        List<GameObject> connections = GetAllConnections(structure);
+        foreach (GameObject conn in connections)
         {
-            Material mat = kvpCM.GetValue(ore);
-            if (mat != null || mat != default)
+            LineRenderer lr = conn.GetComponent<LineRenderer>();
+            if (lr != null)
             {
-                foreach (var conection in connections)
-                {
-                    conection.GetComponent<LineRenderer>().material = mat;
-                }
+                lr.material = mat;
             }
         }
     }
 
-    public List<GameObject> GetAllConnections(GameObject structure) {
-        List<GameObject> connections = new List<GameObject>();
-        foreach (KeyValuePairSerializable<GameObject, GameObject> kvpDSC in drillStationConnections)
+    public List<GameObject> GetAllConnections(GameObject structure)
+    {
+        List<GameObject> result = new List<GameObject>();
+        foreach (var kvp in drillStationConnections)
         {
-            GameObject connection = kvpDSC.GetValue(structure);
-            if (connection != null || connection != default)
+            if (kvp.Key == structure)
             {
-                connections.Add(connection);
+                result.Add(kvp.Value);
             }
         }
-        return connections;
+        return result;
     }
+
 
     void ClearConnections(GameObject structure)
     {
-        foreach (var connection in drillStationConnections)
+        var toRemove = drillStationConnections
+            .Where(kvp => kvp.Key == structure)
+            .ToList();
+
+        foreach (var connection in toRemove)
         {
-            if(connection.Key != structure) continue;
             drillStationConnections.Remove(connection);
-            Destroy(connection.GetValue(structure));
-        }        
+            if (connection.Value != null)
+                Destroy(connection.Value);
+        }
     }
+
 }
 
 

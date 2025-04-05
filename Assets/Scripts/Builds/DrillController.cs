@@ -90,10 +90,7 @@ public class DrillController : Building
             StopCoroutine("DealDamageOverTime");
             dmgCoroutine = null;
             drilling=OreNames.Default;
-            foreach (GameObject connection in connectionManager.GetAllConnections(gameObject))
-            {
-                connectionManager.AssignConnectionMaterial(drilling, gameObject);
-            }
+            connectionManager.AssignConnectionMaterial(drilling, gameObject);
 
             if (CheckForDrillingSpots())
             {

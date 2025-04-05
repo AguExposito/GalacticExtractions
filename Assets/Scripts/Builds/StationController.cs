@@ -59,7 +59,7 @@ public class StationController : Building
         {
             if (collider.TryGetComponent<DrillController>(out DrillController drillController))
             {
-                connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling);
+                connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling,true);
             }
             else {
                 connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default);
