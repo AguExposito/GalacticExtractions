@@ -11,13 +11,20 @@ public class StationController : Building
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (gameObject.tag == "Instantiated") 
+        if (gameObject.tag == "Instantiated")
         {
             gameObject.tag = "EnergyStorage";
-            BoxCollider2D boxCollider2D = effectRange.AddComponent<BoxCollider2D>();
-            boxCollider2D.size = new Vector2(searchRadius.x, searchRadius.y);
-            boxCollider2D.isTrigger = true;
         }
+        connectionManager = transform.parent.GetComponent<ConnectionsManager>();
+        if (connectionManager == null)
+        {
+            connectionManager = FindFirstObjectByType<ConnectionsManager>();
+        }
+
+        BoxCollider2D boxCollider2D = effectRange.AddComponent<BoxCollider2D>();
+        boxCollider2D.size = new Vector2(searchRadius.x, searchRadius.y);
+        boxCollider2D.isTrigger = true;
+        
         LineRenderer lr= effectRange.GetComponent<LineRenderer>();
         SetLRCorners(lr);
         DetectNearbyStructures();
@@ -50,45 +57,15 @@ public class StationController : Building
         Collider2D[] colliders = Physics2D.OverlapBoxAll(effectRange.transform.position,searchRadius,0f,buildingsLayerMask);
         foreach (Collider2D collider in colliders)
         {
-            CreateNewConnection(collider);
+            if (collider.TryGetComponent<DrillController>(out DrillController drillController))
+            {
+                connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling);
+            }
+            else {
+                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default);
+            }
             DefineVariableStates(collider);
         }
 
-    }
-
-    public void CreateNewConnection(Collider2D collider)
-    {
-        if (collider.gameObject == gameObject || collider.transform.parent.gameObject == gameObject) return; // No conectar consigo mismo
-
-        // Crear un nuevo objeto para la conexión
-        GameObject lrContainer = new GameObject("ConnectionLine");
-        lrContainer.transform.SetParent(transform);
-
-        LineRenderer lr = lrContainer.AddComponent<LineRenderer>();
-        lr.startWidth = 0.15f;
-        lr.endWidth = 0.15f;
-        lr.material = storeCable;
-        lr.sortingOrder = 8;
-        lr.positionCount = 2;
-
-        // Definir los puntos de conexión
-        Vector3[] points = new Vector3[]
-        {
-                transform.position,
-                collider.gameObject.transform.position
-        };
-        lr.SetPositions(points);
-
-        // Guardar la conexión en la lista
-        connections.Add(lrContainer);
-    }
-
-    void ClearConnections()
-    {
-        foreach (GameObject connection in connections)
-        {
-            Destroy(connection);
-        }
-        connections.Clear();
     }
 }

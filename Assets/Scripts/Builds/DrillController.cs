@@ -39,20 +39,30 @@ public class DrillController : Building
             new Vector3(-0.5f,0.5f+cellsToDrill,0),//TL
         };
         effectReach.GetComponent<LineRenderer>().SetPositions(corners);
-
-        TryConnectToNearbyStations();
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (gameObject.tag == "Instantiated")
+        {
+            gameObject.tag = "Drill";
+        }
+
+        connectionManager = transform.parent.GetComponent<ConnectionsManager>();
+        if (connectionManager == null)
+        {
+            connectionManager = FindFirstObjectByType<ConnectionsManager>();
+        }
+
+        TryConnectToNearbyStations();
+
         oreTilemap = GameObject.FindGameObjectWithTag("OreTilemap").GetComponent<Tilemap>();
         wallsTilemap = GameObject.FindGameObjectWithTag("WallsTilemap").GetComponent<Tilemap>();
         damageTile = FindFirstObjectByType<DamageTile>();
         initialHeadPos = drillHead.transform.position;
 
-        if (CheckForDrillingSpots() && gameObject.tag == "Instantiated")
+        if (CheckForDrillingSpots())
         {
-            gameObject.tag = "Drill";
             ExtendTube();
         }
     }
@@ -71,6 +81,8 @@ public class DrillController : Building
             if (damageTile.oreGenerator.oreTileData.TryGetValue(nextCellPos, out TileData tileData))
             {
                 drilling = tileData.oreName;
+                connectionManager.AssignConnectionMaterial(drilling,gameObject);
+                
             }
         }
         else
@@ -78,6 +90,11 @@ public class DrillController : Building
             StopCoroutine("DealDamageOverTime");
             dmgCoroutine = null;
             drilling=OreNames.Default;
+            foreach (GameObject connection in connectionManager.GetAllConnections(gameObject))
+            {
+                connectionManager.AssignConnectionMaterial(drilling, gameObject);
+            }
+
             if (CheckForDrillingSpots())
             {
                 ExtendTube();
@@ -182,18 +199,19 @@ public class DrillController : Building
 
     void TryConnectToNearbyStations()
     {
-        int stationLayerMask = 1 << 8; // Asumimos que las estaciones también están en BuildingsLayer
+        int stationLayerMask = 1 << 8; 
 
         Collider2D[] nearbyColliders = Physics2D.OverlapBoxAll(transform.position, searchRadius,0f, stationLayerMask);
 
         foreach (Collider2D col in nearbyColliders)
         {
             if (col.gameObject == gameObject || col.transform.parent.gameObject == gameObject) continue; // No conectar consigo mismo
-            if (col.TryGetComponent<StationController>(out StationController stationController))
+            if (col.CompareTag("Storage") || col.CompareTag("Energy") || col.CompareTag("EnergyStorage")) 
             {
-                stationController.CreateNewConnection(gameObject.GetComponent<Collider2D>()); // se le pasa el collider del gameobject así la estaicon hace la conexión correspondiente
+                if (col.gameObject == gameObject || col.transform.parent.gameObject == gameObject) return; // No conectar consigo mismo
+                connectionManager.CreateNewConnection(col, gameObject, drilling);
+                DefineVariableStates(col);
             }
-            DefineVariableStates(col);
         }
     }
 }

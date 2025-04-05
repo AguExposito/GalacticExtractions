@@ -1,7 +1,6 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.InputSystem;
 
 [System.Serializable]
 public class KeyValuePairSerializable<TKey, TValue>
@@ -14,23 +13,126 @@ public class KeyValuePairSerializable<TKey, TValue>
         Key = key;
         Value = value;
     }
+
+    public TValue GetValue(TKey key)
+    {
+        TValue retValue= default(TValue);
+        if (Key.ToString() == key.ToString())
+        {
+            retValue = Value;
+        }
+        if (key is GameObject gameObject && Key is GameObject gameObjectKey) {
+            if (gameObjectKey.GetInstanceID() == gameObject.GetInstanceID())
+            {
+                retValue= Value;  // Si la clave coincide, devuelve el valor
+            }
+        }
+        return retValue; 
+    }
+
+    public TKey GetKey(TValue value)
+    {
+        TKey retKey = default(TKey);
+        if (Value.ToString() == value.ToString())
+        {
+            retKey= Key;
+        }
+        if (value is GameObject gameObject && value is GameObject gameObjectValue)
+        {
+            if (gameObject.GetInstanceID() == gameObjectValue.GetInstanceID())
+            {
+                retKey= Key;  // Si la clave coincide, devuelve el valor
+            }
+        }
+        return retKey;
+    }
+    public void SetKey(TKey newKey)
+    {
+        Key = newKey;
+    }
+
+    // Método para establecer un nuevo valor
+    public void SetValue(TValue newValue)
+    {
+        Value = newValue;
+    }
 }
 public class ConnectionsManager : MonoBehaviour
 {
     public List<KeyValuePairSerializable<OreNames,Material>> connectionMat = new List<KeyValuePairSerializable<OreNames,Material>>();
+    public List<KeyValuePairSerializable<GameObject,GameObject>> drillStationConnections = new List<KeyValuePairSerializable<GameObject, GameObject>>();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    public void CreateNewConnection(Collider2D collider, GameObject currentGO, OreNames ore)
     {
-        
+
+        // Crear un nuevo objeto para la conexión
+        GameObject lrContainer = new GameObject("ConnectionLine");
+        lrContainer.transform.SetParent(transform);
+
+        LineRenderer lr = lrContainer.AddComponent<LineRenderer>();
+        lr.startWidth = 0.15f;
+        lr.endWidth = 0.15f;
+        lr.sortingOrder = 8;
+        lr.positionCount = 2;
+        lr.material = connectionMat[0].Value; 
+
+        // Definir los puntos de conexión
+        Vector3[] points = new Vector3[]
+        {
+                currentGO.transform.position,
+                collider.gameObject.transform.position
+        };
+        lr.SetPositions(points);
+
+        // Guardar la conexión nueva en la lista
+        KeyValuePairSerializable<GameObject, GameObject> newConnection = new KeyValuePairSerializable<GameObject, GameObject>(collider.gameObject, lrContainer);
+        drillStationConnections.Add(newConnection);
+        KeyValuePairSerializable<GameObject, GameObject> newConnection2 = new KeyValuePairSerializable<GameObject, GameObject>(currentGO, lrContainer);
+        drillStationConnections.Add(newConnection2);
+
+        AssignConnectionMaterial(ore, lrContainer);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void AssignConnectionMaterial(OreNames ore, GameObject lrContainer)
     {
-        
+        List<GameObject> connections = GetAllConnections(lrContainer);
+        //Asignar material
+        foreach (KeyValuePairSerializable<OreNames, Material> kvpCM in connectionMat)
+        {
+            Material mat = kvpCM.GetValue(ore);
+            if (mat != null || mat != default)
+            {
+                foreach (var conection in connections)
+                {
+                    conection.GetComponent<LineRenderer>().material = mat;
+                }
+            }
+        }
     }
 
+    public List<GameObject> GetAllConnections(GameObject structure) {
+        List<GameObject> connections = new List<GameObject>();
+        foreach (KeyValuePairSerializable<GameObject, GameObject> kvpDSC in drillStationConnections)
+        {
+            GameObject connection = kvpDSC.GetValue(structure);
+            if (connection != null || connection != default)
+            {
+                connections.Add(connection);
+            }
+        }
+        return connections;
+    }
+
+    void ClearConnections(GameObject structure)
+    {
+        foreach (var connection in drillStationConnections)
+        {
+            if(connection.Key != structure) continue;
+            drillStationConnections.Remove(connection);
+            Destroy(connection.GetValue(structure));
+        }        
+    }
 }
 
 

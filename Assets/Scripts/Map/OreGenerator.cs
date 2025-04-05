@@ -87,7 +87,15 @@ public class OreGenerator : MonoBehaviour
             Vector3Int current = openSet.Dequeue();
             if (closedSet.Contains(current) || !mapGenerator.wallsTilemap.HasTile(current)) continue;
 
+            // Si el tile ya tiene un mineral, lo ignoramos (esto previene la sobreescritura con otro tipo de mineral)
+            if (oreTilemap.GetTile(current) != null)
+            {
+                Debug.Log("Tile already occupied, skipping: " + current);
+                continue;
+            }
+
             oreTilemap.SetTile(current, oreType);
+
             if (!oreTileData.ContainsKey(current))
             {
                 oreTileData.Add(current, new TileData(current, oreType, TileData.TileType.ore));
@@ -97,11 +105,15 @@ public class OreGenerator : MonoBehaviour
 
             foreach (Vector3Int neighbor in GetNeighbors(current))
             {
-                if (!closedSet.Contains(neighbor) && Random.value > 0.3f) // Probabilidad de expansión
+                // Solo expande si es un tile válido y no ha sido visitado
+                if (!closedSet.Contains(neighbor) && mapGenerator.wallsTilemap.HasTile(neighbor))
                 {
-                    openSet.Enqueue(neighbor);
+                    if (Random.value > 0.3f) // Probabilidad de expansión
+                    {
+                        openSet.Enqueue(neighbor);
+                    }
                 }
-                
+
             }
         }
     }
