@@ -3,24 +3,19 @@ using System.Collections;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-public class StationController : MonoBehaviour
+public class StationController : Building
 {
-    public bool hasEnergy = false;
-    public bool hasStorage = false;
-    public float squareRangeX = 13;
-    public float squareRangeY = 13;
-    Vector2 size;
     public GameObject effectRange;
     public Material storeCable;
     public List<GameObject> connections = new List<GameObject>();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        size = new Vector2(squareRangeX, squareRangeY);
-        if (gameObject.tag == "Building") 
-        { 
+        if (gameObject.tag == "Instantiated") 
+        {
+            gameObject.tag = "EnergyStorage";
             BoxCollider2D boxCollider2D = effectRange.AddComponent<BoxCollider2D>();
-            boxCollider2D.size = new Vector2(squareRangeX, squareRangeY);
+            boxCollider2D.size = new Vector2(searchRadius.x, searchRadius.y);
             boxCollider2D.isTrigger = true;
         }
         LineRenderer lr= effectRange.GetComponent<LineRenderer>();
@@ -38,8 +33,8 @@ public class StationController : MonoBehaviour
     }
 
     void SetLRCorners(LineRenderer lr) {
-        float rangeX = ((float)squareRangeX / 2);
-        float rangeY = ((float)squareRangeY / 2);
+        float rangeX = ((float)searchRadius.x / 2);
+        float rangeY = ((float)searchRadius.y / 2);
         Vector3[] corners = new Vector3[]
         {
             new Vector3(-rangeX,-rangeY,0),//BL
@@ -52,7 +47,7 @@ public class StationController : MonoBehaviour
 
     public void DetectNearbyStructures() {
         int buildingsLayerMask = 1 << 8; //Es lo mismo que LayerMask.GetMask("BuildingsLayer");
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(effectRange.transform.position,size,0f,buildingsLayerMask);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(effectRange.transform.position,searchRadius,0f,buildingsLayerMask);
         foreach (Collider2D collider in colliders)
         {
             CreateNewConnection(collider);
@@ -90,12 +85,13 @@ public class StationController : MonoBehaviour
 
     private void DefineVariableStates(Collider2D collider)
     {
+        
         switch (collider.tag)
         {
             case "EnergyStorage": { hasEnergy = true; hasStorage = true; } break;
             case "Storage": { hasStorage = true; } break;
             case "Energy": { hasEnergy = true; } break;
-            default: { } break;
+            default: { Debug.Log("No coincidio con los tags definidos " + collider.tag); } break;
         }
     }
 

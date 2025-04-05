@@ -127,7 +127,7 @@ public class MapGenerator : MonoBehaviour
                     if (caveNoise > caveThreshold && wallsTilemap.GetTile(new Vector3Int(x, y, 0)) == null)
                     {
                         wallsTilemap.SetTile(new Vector3Int(x, y, 0), wallTile);                        
-                        wallTileData.Add(new Vector3Int(x, y, 0), new TileData(new Vector3Int(x, y, 0), wallTile, TileData.tileType.wall));
+                        wallTileData.Add(new Vector3Int(x, y, 0), new TileData(new Vector3Int(x, y, 0), wallTile, TileData.TileType.wall));
                     }
                 }
             }

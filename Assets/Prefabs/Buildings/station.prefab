@@ -269,6 +269,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasEnergy: 0
   hasStorage: 0
+  searchRadius: {x: 13, y: 13}
   squareRangeX: 13
   squareRangeY: 13
   effectRange: {fileID: 4956008948219910704}

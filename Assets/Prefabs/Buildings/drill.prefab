@@ -153,7 +153,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasEnergy: 0
   hasStorage: 0
-  searchRadius: 11
+  searchRadiusX: 10
+  searchRadiusY: 10
+  searchRadius: {x: 11, y: 11}
   cellsToDrill: 10
   extractionDamage: 5
   timePerDmgTick: 0.2
@@ -161,6 +163,7 @@ MonoBehaviour:
   drillHead: {fileID: 4806498723568632872}
   drillTube: {fileID: 8787640004681173413}
   effectReach: {fileID: 6365146158360107913}
+  drilling: 0
 --- !u!95 &503905185867541535
 Animator:
   serializedVersion: 7

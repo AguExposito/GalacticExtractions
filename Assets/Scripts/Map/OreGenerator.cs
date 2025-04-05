@@ -90,7 +90,7 @@ public class OreGenerator : MonoBehaviour
             oreTilemap.SetTile(current, oreType);
             if (!oreTileData.ContainsKey(current))
             {
-                oreTileData.Add(current, new TileData(current, oreType, TileData.tileType.ore));
+                oreTileData.Add(current, new TileData(current, oreType, TileData.TileType.ore));
                 mapGenerator.wallTileData.Remove(current);
             }
             closedSet.Add(current);

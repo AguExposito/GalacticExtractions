@@ -4,12 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.Tilemaps;
 
-public class DrillController : MonoBehaviour
+public class DrillController : Building
 {
-    public bool hasEnergy=false;
-    public bool hasStorage=false;
-    public float searchRadius = 10f; // o lo que sea razonable
-    [Space]
     public int cellsToDrill = 10;
     public int extractionDamage = 10;
     public float timePerDmgTick = 0.2f;
@@ -17,15 +13,18 @@ public class DrillController : MonoBehaviour
     public GameObject drillHead;
     public GameObject drillTube;
     public GameObject effectReach;
+    [Space]
+    public OreNames drilling;
+
     Vector3Int nextCellPos;
     Vector3 initialHeadPos;
     bool isExtending;
-
     Tilemap oreTilemap;
     Tilemap wallsTilemap;
     DamageTile damageTile;
     Coroutine dmgCoroutine;
     InputSystem_Actions controls;
+
     private void Awake()
     {
         // Aseguramos que el sistema de input esté inicializado antes de usarlo
@@ -51,8 +50,9 @@ public class DrillController : MonoBehaviour
         damageTile = FindFirstObjectByType<DamageTile>();
         initialHeadPos = drillHead.transform.position;
 
-        if (CheckForDrillingSpots() && gameObject.tag == "Building") //Building tag means that is instantiated
+        if (CheckForDrillingSpots() && gameObject.tag == "Instantiated")
         {
+            gameObject.tag = "Drill";
             ExtendTube();
         }
     }
@@ -60,7 +60,7 @@ public class DrillController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isExtending || gameObject.tag != "Building") { return; }
+        if (isExtending || gameObject.tag != "Drill") { return; }
 
         if (damageTile.oreGenerator.oreTileData.ContainsKey(nextCellPos) || damageTile.mapGenerator.wallTileData.ContainsKey(nextCellPos))
         {
@@ -68,11 +68,16 @@ public class DrillController : MonoBehaviour
             {
                 dmgCoroutine = StartCoroutine(DealDamageOverTime(nextCellPos, extractionDamage, timePerDmgTick));
             }
+            if (damageTile.oreGenerator.oreTileData.TryGetValue(nextCellPos, out TileData tileData))
+            {
+                drilling = tileData.oreName;
+            }
         }
         else
         {
             StopCoroutine("DealDamageOverTime");
             dmgCoroutine = null;
+            drilling=OreNames.Default;
             if (CheckForDrillingSpots())
             {
                 ExtendTube();
@@ -179,7 +184,7 @@ public class DrillController : MonoBehaviour
     {
         int stationLayerMask = 1 << 8; // Asumimos que las estaciones también están en BuildingsLayer
 
-        Collider2D[] nearbyColliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(searchRadius,searchRadius),0f, stationLayerMask);
+        Collider2D[] nearbyColliders = Physics2D.OverlapBoxAll(transform.position, searchRadius,0f, stationLayerMask);
 
         foreach (Collider2D col in nearbyColliders)
         {

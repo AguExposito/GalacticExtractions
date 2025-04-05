@@ -282,7 +282,7 @@ public class BuildingSystem : MonoBehaviour
             GameObject building = Instantiate(selectedStructure, currentPreview.transform.position, Quaternion.identity, previewParent);
             building.transform.rotation = currentPreview.transform.rotation;
             building.GetComponent<Collider2D>().enabled = true;
-
+            building.tag = "Instantiated";
             DestroyPreview();
 
             //Se llama 2 veces para refrescar sin que cambie el estado

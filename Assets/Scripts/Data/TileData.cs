@@ -2,30 +2,34 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+public enum OreType { basic, soft, semihard, hard }
+public enum OreNames { Default, Fliotex, Polarnyx, Trevonita }
+public class OreData {
+    public OreType ore;
+    public OreNames oreName;
 
-public class TileData
+    public int oreAmount;
+    public int extractedOres;
+    public int healthPerOre;
+}
+public class TileData:OreData
 {
-    public enum tileType { wall, ore }
-    public enum oreType { basic ,soft, semihard, hard }
-    public enum biomeType { ground ,dirt, desert, snow }
+    public enum TileType { wall, ore }
+    public enum BiomeType { ground ,dirt, desert, snow }
 
     public Vector3Int position;
     public TileBase tile;
     public string tileName;
     public int health;
     public int maxHealth;
-    public tileType type;
-    public oreType ore;
-    public biomeType biome;
-    public int oreAmount;
-    public int extractedOres;
-    public int healthPerOre;
+    public TileType type;
+    public BiomeType biome;
     public GameObject biomeResources;
     public TextMeshProUGUI biomeResourcesText;
     public MapGenerator mapGenerator;
     public ResourceManager resourceManager;
 
-    public TileData(Vector3Int pos, TileBase tileBase, tileType tileType)
+    public TileData(Vector3Int pos, TileBase tileBase, TileType tileType)
     {
         position = pos;
         tile = tileBase;
@@ -38,10 +42,10 @@ public class TileData
 
         switch (this.ore)
         {
-            case oreType.soft: { health = 100; oreAmount = Random.Range(75,150); } break;
-            case oreType.semihard: { health = 200; oreAmount = Random.Range(50, 100); } break;
-            case oreType.hard: { health = 500; oreAmount = Random.Range(25, 50); } break;
-            case oreType.basic: { health = 5; } break;
+            case OreType.soft: { health = 100; oreAmount = Random.Range(75,150); } break;
+            case OreType.semihard: { health = 200; oreAmount = Random.Range(50, 100); } break;
+            case OreType.hard: { health = 500; oreAmount = Random.Range(25, 50); } break;
+            case OreType.basic: { health = 5; } break;
             default: { Debug.Log("Didn't found wall tile type: " + tileBase.name + "hp set to 5"); health = 5; } break;
         }
         maxHealth = health;
@@ -51,11 +55,11 @@ public class TileData
     bool AssignBiomeAndOreType() {
         mapGenerator = GameObject.FindFirstObjectByType<MapGenerator>();
         TileBase biomeGroundTile=null;
-        if (type == tileType.wall)
+        if (type == TileType.wall)
         {
             biomeGroundTile = mapGenerator.biomeTiles.FirstOrDefault(x => x.Value == tile).Key; //Se obtiene la key del diccionario a traves del valor
         }
-        else if (type == tileType.ore)
+        else if (type == TileType.ore)
         {
             mapGenerator.wallTileData.TryGetValue(position,out TileData walltile); //Se navega a este diccionario para obtener la wall debajo del ore
             biomeGroundTile = mapGenerator.biomeTiles.FirstOrDefault(x => x.Value == walltile.tile).Key; //Se obtiene la key del diccionario a traves del valor
@@ -66,24 +70,24 @@ public class TileData
         switch (biomeGroundTile.name) {
             case "GroundTile": {
                     biomeResources = biomeResources.transform.GetChild(0).gameObject;
-                    biome = biomeType.ground; 
+                    biome = BiomeType.ground; 
                 } break;
             case "DirtTile": {
                     biomeResources = biomeResources.transform.GetChild(1).gameObject;
-                    biome = biomeType.dirt; 
+                    biome = BiomeType.dirt; 
                 } break;
             case "DesertTile": {
                     biomeResources = biomeResources.transform.GetChild(2).gameObject;
-                    biome = biomeType.desert; 
+                    biome = BiomeType.desert; 
                 } break;
             case "SnowTile": {
                     biomeResources = biomeResources.transform.GetChild(3).gameObject;
-                    biome = biomeType.snow; 
+                    biome = BiomeType.snow; 
                 } break;
             default: {
                     biomeResources = biomeResources.transform.GetChild(0).gameObject;
                     Debug.LogWarning("SE AUTOASIGNO BIOMA A GROUND, REVISAR SI FALTA AÑADIR UN BIOMA AL SWITCH"); 
-                    biome = biomeType.ground; 
+                    biome = BiomeType.ground; 
                 } break;
         }        
 
@@ -96,26 +100,30 @@ public class TileData
                         if (biomeResources.transform.GetChild(i).name == "Fliotex")
                         {
                             biomeResourcesText= biomeResources.transform.GetChild(i).GetComponent<TextMeshProUGUI>();
-                            ore = oreType.soft;
+                            ore = OreType.soft;
+                            oreName = OreNames.Fliotex;
                         }
                     } break;
                 case "polarnyxTile": {
                         if (biomeResources.transform.GetChild(i).name == "Polarnyx")
                         {
                             biomeResourcesText = biomeResources.transform.GetChild(i).GetComponent<TextMeshProUGUI>();
-                            ore = oreType.semihard;
+                            ore = OreType.semihard;
+                            oreName = OreNames.Polarnyx;
                         }
                     } break;
                 case "trevonitaTile": {
                         if (biomeResources.transform.GetChild(i).name == "Trevonita")
                         {
                             biomeResourcesText = biomeResources.transform.GetChild(i).GetComponent<TextMeshProUGUI>();
-                            ore = oreType.hard;
+                            ore = OreType.hard;
+                            oreName = OreNames.Trevonita;
                         }
                     } break;
                 default: {
                         biomeResourcesText = biomeResources.transform.GetChild(i).GetComponent<TextMeshProUGUI>();
-                        ore = oreType.basic; 
+                        ore = OreType.basic;
+                        oreName = OreNames.Default;
                     } break;
             }
         }
@@ -124,7 +132,7 @@ public class TileData
 
     public int ExtractOre()
     {
-        if (extractedOres >= oreAmount || health <= 0 || type == tileType.wall) return 0; // Ya está agotado
+        if (extractedOres >= oreAmount || health <= 0 || type == TileType.wall) return 0; // Ya está agotado
 
         int expectedExtractedOres = oreAmount - Mathf.FloorToInt((health / (float)maxHealth) * oreAmount);
 

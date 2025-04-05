@@ -5,7 +5,6 @@ TagManager:
   serializedVersion: 3
   tags:
   - player
-  - Building
   - OreTilemap
   - WallsTilemap
   - BiomeResourcesHUD
@@ -13,6 +12,8 @@ TagManager:
   - Energy
   - Storage
   - EnergyStorage
+  - Instantiated
+  - Drill
   layers:
   - Default
   - TransparentFX
