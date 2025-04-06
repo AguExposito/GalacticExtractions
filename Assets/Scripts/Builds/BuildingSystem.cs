@@ -109,9 +109,9 @@ public class BuildingSystem : MonoBehaviour
         {
             lastTocuhPosition = finger.screenPosition;
             PositioningBuilding();
-        }
 
-        EnableRadialMenuDestroyView();
+            EnableRadialMenuDestroyView();
+        }
     }
     bool state=true;
     public void EnableLR() {
