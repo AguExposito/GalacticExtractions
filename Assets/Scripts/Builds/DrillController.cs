@@ -61,7 +61,7 @@ public class DrillController : Building
         damageTile = FindFirstObjectByType<DamageTile>();
         initialHeadPos = drillHead.transform.position;
 
-        if (CheckForDrillingSpots())
+        if (CheckForDrillingSpots() && hasEnergy && hasStorage)
         {
             ExtendTube();
         }
@@ -70,7 +70,7 @@ public class DrillController : Building
     // Update is called once per frame
     void Update()
     {
-        if (isExtending || gameObject.tag != "Drill") { return; }
+        if (isExtending || gameObject.tag != "Drill" ||  !hasEnergy || !hasStorage) { return; }
 
         if (damageTile.oreGenerator.oreTileData.ContainsKey(nextCellPos) || damageTile.mapGenerator.wallTileData.ContainsKey(nextCellPos))
         {
