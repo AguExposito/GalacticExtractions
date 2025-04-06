@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 
@@ -73,6 +75,16 @@ public class DamageTile : MonoBehaviour
         Vector3 worldPoint = Camera.main.ScreenToWorldPoint(screenPosition);
         return mapGenerator.wallsTilemap.WorldToCell(worldPoint);
     }
+    private bool IsTouchOverUI(Vector2 touchPosition)
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current)
+        {
+            position = touchPosition
+        };
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+        return results.Count > 0;
+    }
 
     private void OnEnable()
     {
@@ -82,14 +94,20 @@ public class DamageTile : MonoBehaviour
         controls.Player.Attack.performed += ctx =>
         {
             Vector2 screenPosition = Mouse.current.position.ReadValue();
-            DamageTileData(GetTilePositionOnClick(screenPosition), damage);
+            if (!IsTouchOverUI(screenPosition))
+            {
+                DamageTileData(GetTilePositionOnClick(screenPosition), damage);
+            }
         };
 
         // **Móviles: Detectar toque en la pantalla**
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += finger =>
         {
             Vector2 touchPosition = finger.screenPosition;
-            DamageTileData(GetTilePositionOnClick(touchPosition), damage);
+            if (!IsTouchOverUI(touchPosition))
+            {
+                DamageTileData(GetTilePositionOnClick(touchPosition), damage);
+            }
         };
     }
 
