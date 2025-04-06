@@ -54,10 +54,7 @@ public class DrillController : Building
         damageTile = FindFirstObjectByType<DamageTile>();
         initialHeadPos = drillHead.transform.position;
 
-        if (CheckForDrillingSpots())
-        {
-            ExtendTube();
-        }
+        ExtendTube();
 
         if (gameObject.tag == "Instantiated")
         {
@@ -91,15 +88,7 @@ public class DrillController : Building
             drilling=OreNames.Default;
             connectionManager.AssignConnectionMaterial(drilling, gameObject);
 
-            if (CheckForDrillingSpots())
-            {
-                ExtendTube();
-            }
-            else
-            {
-                isExtending = true;
-                Debug.Log("No hay más Tiles para destruir");
-            }
+            ExtendTube();
         }
     }
 
@@ -115,6 +104,8 @@ public class DrillController : Building
                 return true;
             }
         }
+        isExtending = true;
+        Debug.Log("No hay más Tiles para destruir");
         return false;
     }
     Vector3Int GetDrillDirection()
@@ -131,7 +122,7 @@ public class DrillController : Building
 
     public void ExtendTube()
     {
-        if (isExtending || !hasEnergy || !hasStorage) return;
+        if (isExtending || !hasEnergy || !hasStorage || !CheckForDrillingSpots()) return;
         isExtending = true;
         Debug.Log("WaitForTubeExtension");
         StartCoroutine(WaitForTubeExtension());
