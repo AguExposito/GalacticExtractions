@@ -94,7 +94,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: c0d9ad4f79f83414f8e85dcb8d7f3a92, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1112,6 +1112,7 @@ MonoBehaviour:
   - Key: 3
     Value: {fileID: 2100000, guid: 339bed755a081f14cb810c5294c652d4, type: 2}
   drillStationConnections: []
+  connections: []
 --- !u!1 &349602037
 GameObject:
   m_ObjectHideFlags: 0
