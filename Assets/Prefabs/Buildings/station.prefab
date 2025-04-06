@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5984797203988434358}
   - component: {fileID: 8987948755774910394}
+  - component: {fileID: 6069963035726388431}
   - component: {fileID: 4709269449806653618}
   - component: {fileID: 1074123086651248231}
-  - component: {fileID: 6069963035726388431}
   m_Layer: 8
   m_Name: station
   m_TagString: EnergyStorage
@@ -91,6 +91,35 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6069963035726388431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425805131903974155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0200873b71eb69499aafce52945c31a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasEnergy: 0
+  hasStorage: 0
+  searchRadius: {x: 13, y: 13}
+  connectionManager: {fileID: 0}
+  onEnergyEnabled:
+    m_PersistentCalls:
+      m_Calls: []
+  onEnergyDisabled:
+    m_PersistentCalls:
+      m_Calls: []
+  onStorageEnabled:
+    m_PersistentCalls:
+      m_Calls: []
+  onStorageDisabled:
+    m_PersistentCalls:
+      m_Calls: []
+  effectRange: {fileID: 4956008948219910704}
 --- !u!61 &4709269449806653618
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -255,24 +284,6 @@ LineRenderer:
   m_UseWorldSpace: 0
   m_Loop: 1
   m_ApplyActiveColorSpace: 1
---- !u!114 &6069963035726388431
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1425805131903974155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0200873b71eb69499aafce52945c31a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hasEnergy: 0
-  hasStorage: 0
-  searchRadius: {x: 13, y: 13}
-  effectRange: {fileID: 4956008948219910704}
-  storeCable: {fileID: 2100000, guid: 9b1ee60fa16cf9649b731c7169808deb, type: 2}
-  connections: []
 --- !u!1 &4956008948219910704
 GameObject:
   m_ObjectHideFlags: 0
@@ -283,7 +294,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5270265173858728782}
   - component: {fileID: 6444818325540275866}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EffectReach
   m_TagString: EffectReach
   m_Icon: {fileID: 0}

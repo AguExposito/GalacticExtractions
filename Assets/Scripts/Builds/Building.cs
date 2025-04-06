@@ -65,4 +65,42 @@ public class Building : MonoBehaviour
         if (state) { onStorageEnabled.Invoke(); }
         else { onStorageDisabled.Invoke(); }
     }
+
+    public void DetectNearbyStructures(bool selfConnection=false)
+    {
+        if (searchRadius == Vector2.zero) return; //Esto evita que una estructura con rango 0 intente buscar conexiones.
+
+        int buildingsLayerMask = 1 << 8; //Es lo mismo que LayerMask.GetMask("BuildingsLayer");
+
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, searchRadius, 0f, buildingsLayerMask);
+        foreach (Collider2D collider in colliders)
+        {
+            if (gameObject.tag == "Drill" && collider.tag=="Drill") continue; //Esto conexiones taladro-taladro
+            if (!selfConnection)
+                if (collider.gameObject == gameObject) continue; // Evitar auto-conexión
+
+            Building otherBuilding = collider.GetComponent<Building>();
+            if (otherBuilding == null) continue;
+
+            Vector2 offset = collider.transform.position - transform.position;
+            Vector2 otherRadius = collider.GetComponent<Building>().searchRadius;
+
+            if (Mathf.Abs(offset.x) > otherRadius.x / 2f || Mathf.Abs(offset.y) > otherRadius.y / 2f )
+            {
+                continue; // No está dentro del rango cuadrado del otro objeto
+            }
+
+
+            if (collider.TryGetComponent<DrillController>(out DrillController drillController))
+            {
+                connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling, true);
+            }
+            else
+            {
+                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default);
+            }
+            DefineVariableStates(collider);
+        }
+
+    }
 }

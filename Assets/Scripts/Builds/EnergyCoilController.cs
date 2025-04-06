@@ -1,9 +1,7 @@
-using UnityEngine;
-using System.Collections;
-using NUnit.Framework;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class StationController : Building
+public class EnergyCoilController : Building
 {
     public GameObject effectRange;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -24,12 +22,13 @@ public class StationController : Building
 
         if (gameObject.tag == "Instantiated")
         {
-            gameObject.tag = "EnergyStorage";
-            DetectNearbyStructures(true);
-        }        
+            gameObject.tag = "Energy";
+            DetectNearbyStructures();
+        }
     }
 
-    Vector3[] GetLRCorners(LineRenderer lr) {
+    Vector3[] GetLRCorners(LineRenderer lr)
+    {
         Vector3[] corners = new Vector3[lr.positionCount];
         for (int i = 0; i < lr.positionCount; i++)
         {
@@ -38,7 +37,8 @@ public class StationController : Building
         return corners;
     }
 
-    void SetLRCorners(LineRenderer lr) {
+    void SetLRCorners(LineRenderer lr)
+    {
         float rangeX = ((float)searchRadius.x / 2);
         float rangeY = ((float)searchRadius.y / 2);
         Vector3[] corners = new Vector3[]
