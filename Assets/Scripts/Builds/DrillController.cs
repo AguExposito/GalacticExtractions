@@ -49,17 +49,16 @@ public class DrillController : Building
             connectionManager = FindFirstObjectByType<ConnectionsManager>();
         }
 
-        if (gameObject.tag == "Instantiated")
-        {
-            gameObject.tag = "Drill";
-            TryConnectToNearbyStations();
-        }
-
         oreTilemap = GameObject.FindGameObjectWithTag("OreTilemap").GetComponent<Tilemap>();
         wallsTilemap = GameObject.FindGameObjectWithTag("WallsTilemap").GetComponent<Tilemap>();
         damageTile = FindFirstObjectByType<DamageTile>();
         initialHeadPos = drillHead.transform.position;
 
+        if (gameObject.tag == "Instantiated")
+        {
+            gameObject.tag = "Drill";
+            TryConnectToNearbyStations();
+        }
         if (CheckForDrillingSpots())
         {
             ExtendTube();
