@@ -43,25 +43,24 @@ public class DrillController : Building
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (gameObject.tag == "Instantiated")
-        {
-            gameObject.tag = "Drill";
-        }
-
         connectionManager = transform.parent.GetComponent<ConnectionsManager>();
         if (connectionManager == null)
         {
             connectionManager = FindFirstObjectByType<ConnectionsManager>();
         }
 
-        TryConnectToNearbyStations();
+        if (gameObject.tag == "Instantiated")
+        {
+            gameObject.tag = "Drill";
+            TryConnectToNearbyStations();
+        }
 
         oreTilemap = GameObject.FindGameObjectWithTag("OreTilemap").GetComponent<Tilemap>();
         wallsTilemap = GameObject.FindGameObjectWithTag("WallsTilemap").GetComponent<Tilemap>();
         damageTile = FindFirstObjectByType<DamageTile>();
         initialHeadPos = drillHead.transform.position;
 
-        if (CheckForDrillingSpots() && hasEnergy && hasStorage)
+        if (CheckForDrillingSpots())
         {
             ExtendTube();
         }
@@ -130,9 +129,9 @@ public class DrillController : Building
         return Vector3Int.up; // Valor por defecto
     }
 
-    void ExtendTube()
+    public void ExtendTube()
     {
-        if (isExtending) return;
+        if (isExtending || !hasEnergy || !hasStorage) return;
         isExtending = true;
         Debug.Log("WaitForTubeExtension");
         StartCoroutine(WaitForTubeExtension());

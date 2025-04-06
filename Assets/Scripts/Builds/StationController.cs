@@ -11,10 +11,6 @@ public class StationController : Building
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (gameObject.tag == "Instantiated")
-        {
-            gameObject.tag = "EnergyStorage";
-        }
         connectionManager = transform.parent.GetComponent<ConnectionsManager>();
         if (connectionManager == null)
         {
@@ -24,10 +20,15 @@ public class StationController : Building
         BoxCollider2D boxCollider2D = effectRange.AddComponent<BoxCollider2D>();
         boxCollider2D.size = new Vector2(searchRadius.x, searchRadius.y);
         boxCollider2D.isTrigger = true;
-        
-        LineRenderer lr= effectRange.GetComponent<LineRenderer>();
+
+        LineRenderer lr = effectRange.GetComponent<LineRenderer>();
         SetLRCorners(lr);
-        DetectNearbyStructures();
+
+        if (gameObject.tag == "Instantiated")
+        {
+            gameObject.tag = "EnergyStorage";
+            DetectNearbyStructures();
+        }        
     }
 
     Vector3[] GetLRCorners(LineRenderer lr) {
