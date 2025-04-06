@@ -1619,7 +1619,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0000009536743, y: 0.00000047683716, z: -10}
+  m_LocalPosition: {x: -0.00000023841858, y: 0.72000027, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7033,6 +7033,50 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 999037244}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ReparentAndResize
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: RadialMenuController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: RadialMenuController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5885136303723659889, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Transform, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6938389728007126931, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8016108374578785974, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
       propertyPath: m_Name
       value: RadialBuildingMenu

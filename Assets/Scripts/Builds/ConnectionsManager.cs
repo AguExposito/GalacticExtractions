@@ -110,12 +110,14 @@ public class ConnectionsManager : MonoBehaviour
 
     public void AssignConnectionMaterial(OreNames ore, GameObject structure)
     {
+        if (structure == null) return;
         Material mat = connectionMat.Find(kvp => kvp.Key.Equals(ore))?.Value;
         if (mat == null) return;
 
         List<GameObject> connections = GetAllConnections(structure);
         foreach (GameObject conn in connections)
         {
+            if (conn == null || conn.Equals(null)) continue;
             LineRenderer lr = conn.GetComponent<LineRenderer>();
             if (lr != null)
             {
@@ -138,8 +140,9 @@ public class ConnectionsManager : MonoBehaviour
     }
 
 
-    void ClearConnections(GameObject structure)
+    public void ClearConnections(GameObject structure)
     {
+        if (structure == null) return;
         var toRemove = drillStationConnections
             .Where(kvp => kvp.Key == structure)
             .ToList();

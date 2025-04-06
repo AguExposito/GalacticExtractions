@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RadialMenuController : MonoBehaviour
 {
@@ -6,9 +7,10 @@ public class RadialMenuController : MonoBehaviour
     public float optionDistance = 50f;  // Distancia entre cada opción
     public GameObject[] options;        // Array de botones (debe ser vacío inicialmente)
     public int multiplier = 1;          // multiplicador de distancia
-
+    public ConnectionsManager connectionManager;
     private void OnEnable()
     {
+        connectionManager = FindFirstObjectByType<ConnectionsManager>();
         optionDistance *= multiplier;
         ArrangeMenu();
     }
@@ -55,5 +57,31 @@ public class RadialMenuController : MonoBehaviour
         transform.parent.SetParent(tr);
         transform.parent.localPosition=Vector3.zero;
 
+    }
+
+    public void DeleteView(GameObject gameObject) 
+    {
+        options[0].SetActive(false);
+        options[1].SetActive(false);
+        options[2].SetActive(true);
+        options[3].SetActive(false);
+
+        options[2].GetComponent<Button>().onClick.RemoveAllListeners();
+        options[2].GetComponent<Button>().onClick.AddListener(() => DestroyGO(gameObject));
+
+        ArrangeMenu();
+    }
+    void DestroyGO(GameObject gameObject) {
+        connectionManager.ClearConnections(gameObject);
+        ReparentAndResize(null);
+        Destroy(gameObject);
+    }
+    public void PreviewView()
+    {
+        options[0].SetActive(true);
+        options[1].SetActive(true);
+        options[2].SetActive(false);
+        options[3].SetActive(true);
+        ArrangeMenu();
     }
 }

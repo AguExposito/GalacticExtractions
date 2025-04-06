@@ -40,6 +40,7 @@ public class BuildingSystem : MonoBehaviour
             {
                 TryPlaceStructure();
             }
+            EnableRadialMenuDestroyView();
         };
         controls.BuildingSystem.DestroyPreview.performed += ctx => DestroyPreview();
         controls.BuildingSystem.RotatePreview.performed += ctx => RotatePreview();
@@ -54,8 +55,8 @@ public class BuildingSystem : MonoBehaviour
 
     }
 
-    void OnDisable() 
-    { 
+    void OnDisable()
+    {
         controls.Disable();
         //PC
         controls.BuildingSystem.PlaceStructure.performed -= ctx =>
@@ -64,6 +65,7 @@ public class BuildingSystem : MonoBehaviour
             {
                 TryPlaceStructure();
             }
+            EnableRadialMenuDestroyView();
         };
         controls.BuildingSystem.DestroyPreview.performed -= ctx => DestroyPreview();
         controls.BuildingSystem.RotatePreview.performed -= ctx => RotatePreview();
@@ -76,6 +78,28 @@ public class BuildingSystem : MonoBehaviour
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerMove -= HandleFingerDown;
         UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= HandleFingerDown;
     }
+    private void EnableRadialMenuDestroyView()
+    {        
+        if (!isPlacing)
+        {
+            if (radialMenu.gameObject.activeInHierarchy)
+            {
+                radialMenu.gameObject.SetActive(false);
+                radialMenu.ReparentAndResize(null);
+            }
+
+            Vector2 mousePos = GetMouseOrTouchPosition2D();
+            RaycastHit2D ray = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, 1 << 8);  // Detecta solo la capa 8
+
+            if (ray.collider != null)
+            {
+                radialMenu.DeleteView(ray.transform.gameObject);
+                radialMenu.ReparentAndResize(ray.collider.transform);
+                radialMenu.gameObject.SetActive(true);
+            }
+        }
+    }
+
     private void HandleFingerDown(Finger finger)
     {
         // Verifica si el toque está sobre UI
@@ -86,6 +110,8 @@ public class BuildingSystem : MonoBehaviour
             lastTocuhPosition = finger.screenPosition;
             PositioningBuilding();
         }
+
+        EnableRadialMenuDestroyView();
     }
     bool state=true;
     public void EnableLR() {
@@ -193,6 +219,7 @@ public class BuildingSystem : MonoBehaviour
             currentPreview.GetComponent<SpriteRenderer>().color = validColor;
             currentPreview.GetComponent<SpriteRenderer>().sortingOrder = 20;
 #if PLATFORM_ANDROID
+            radialMenu.PreviewView();
             radialMenu.ReparentAndResize(currentPreview.transform);
             radialMenu.gameObject.SetActive(true);
 #endif

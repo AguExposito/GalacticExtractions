@@ -19,6 +19,7 @@ public class DrillController : Building
     Vector3Int nextCellPos;
     Vector3 initialHeadPos;
     bool isExtending;
+    bool isBeingDestroyed;
     Tilemap oreTilemap;
     Tilemap wallsTilemap;
     DamageTile damageTile;
@@ -77,8 +78,11 @@ public class DrillController : Building
             if (damageTile.oreGenerator.oreTileData.TryGetValue(nextCellPos, out TileData tileData))
             {
                 drilling = tileData.oreName;
-                connectionManager.AssignConnectionMaterial(drilling,gameObject);
-                
+                if (connectionManager != null && this != null && !this.Equals(null))
+                {
+                    connectionManager.AssignConnectionMaterial(drilling, gameObject);
+                }
+
             }
         }
         else
@@ -86,12 +90,23 @@ public class DrillController : Building
             StopCoroutine("DealDamageOverTime");
             dmgCoroutine = null;
             drilling=OreNames.Default;
-            connectionManager.AssignConnectionMaterial(drilling, gameObject);
+            if (connectionManager != null && this != null && !this.Equals(null))
+            {
+                connectionManager.AssignConnectionMaterial(drilling, gameObject);
+            }
 
             ExtendTube();
         }
     }
-
+    private void OnDestroy()
+    {
+        isBeingDestroyed = true;
+        if (dmgCoroutine != null)
+        {
+            StopCoroutine(dmgCoroutine);
+            dmgCoroutine = null;
+        }
+    }
     bool CheckForDrillingSpots()
     {
         for (int i = 0; i < cellsToDrill; i++)
