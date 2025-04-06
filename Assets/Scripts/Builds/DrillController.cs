@@ -54,14 +54,15 @@ public class DrillController : Building
         damageTile = FindFirstObjectByType<DamageTile>();
         initialHeadPos = drillHead.transform.position;
 
+        if (CheckForDrillingSpots())
+        {
+            ExtendTube();
+        }
+
         if (gameObject.tag == "Instantiated")
         {
             gameObject.tag = "Drill";
             TryConnectToNearbyStations();
-        }
-        if (CheckForDrillingSpots())
-        {
-            ExtendTube();
         }
     }
 
