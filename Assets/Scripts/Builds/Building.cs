@@ -245,14 +245,27 @@ public class Building : MonoBehaviour
 
             if (collider.TryGetComponent<DrillController>(out DrillController drillController))
             {
-                connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling, true);
+                connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling, BuildingConnectionType.Default,true);
             }
             else
             {
-                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default);
+                DetermineConnectionMat(collider);
+                
             }
             DefineVariableStates(collider);
         }
 
+    }
+
+    void DetermineConnectionMat(Collider2D collider) {
+        switch (collider.tag)
+        {
+            case "Energy":
+                {
+                    connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default,BuildingConnectionType.Energy);
+                }
+                break;
+            default: { connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default); } break;
+        }
     }
 }

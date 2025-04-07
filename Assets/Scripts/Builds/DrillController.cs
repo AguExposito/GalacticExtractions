@@ -80,7 +80,7 @@ public class DrillController : Building
                 drilling = tileData.oreName;
                 if (connectionManager != null && this != null && !this.Equals(null))
                 {
-                    connectionManager.AssignConnectionMaterial(drilling, gameObject);
+                    connectionManager.AssignConnectionMaterial(gameObject, drilling);
                 }
 
             }
@@ -92,7 +92,7 @@ public class DrillController : Building
             drilling=OreNames.Default;
             if (connectionManager != null && this != null && !this.Equals(null))
             {
-                connectionManager.AssignConnectionMaterial(drilling, gameObject);
+                connectionManager.AssignConnectionMaterial(gameObject, drilling);
             }
 
             ExtendTube();

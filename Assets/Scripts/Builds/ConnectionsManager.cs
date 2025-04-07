@@ -3,6 +3,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum BuildingConnectionType { Energy, Storage, Default}
+
 [System.Serializable]
 public class KeyValuePairSerializable<TKey, TValue>
 {
@@ -61,10 +63,11 @@ public class KeyValuePairSerializable<TKey, TValue>
 public class ConnectionsManager : MonoBehaviour
 {
     public List<KeyValuePairSerializable<OreNames,Material>> connectionMat = new List<KeyValuePairSerializable<OreNames,Material>>();
+    public List<KeyValuePairSerializable<BuildingConnectionType,Material>> buildingConnectionMat = new List<KeyValuePairSerializable<BuildingConnectionType, Material>>();
     public List<KeyValuePairSerializable<GameObject,GameObject>> drillStationConnections = new List<KeyValuePairSerializable<GameObject, GameObject>>();
-    public List<GameObject> connections;
 
-    public void CreateNewConnection(Collider2D collider, GameObject currentGO, OreNames ore, bool isInverse =false)
+
+    public void CreateNewConnection(Collider2D collider, GameObject currentGO, OreNames ore = OreNames.Default, BuildingConnectionType buildingConnectionType = BuildingConnectionType.Default, bool isInverse =false)
     {
 
         // Crear un nuevo objeto para la conexión
@@ -104,14 +107,27 @@ public class ConnectionsManager : MonoBehaviour
         drillStationConnections.Add(newConnection);
         KeyValuePairSerializable<GameObject, GameObject> newConnection2 = new KeyValuePairSerializable<GameObject, GameObject>(currentGO, lrContainer);
         drillStationConnections.Add(newConnection2);
-
-        AssignConnectionMaterial(ore, lrContainer);
+        
+        if (buildingConnectionType == BuildingConnectionType.Default)
+        {
+            AssignConnectionMaterial(currentGO, ore);
+        }
+        else {
+            AssignConnectionMaterial(currentGO, ore, buildingConnectionType);
+        }
     }
 
-    public void AssignConnectionMaterial(OreNames ore, GameObject structure)
+    public void AssignConnectionMaterial(GameObject structure, OreNames ore = OreNames.Default, BuildingConnectionType buildingConnectionType = BuildingConnectionType.Default)
     {
         if (structure == null) return;
-        Material mat = connectionMat.Find(kvp => kvp.Key.Equals(ore))?.Value;
+        Material mat;
+        if (buildingConnectionType == BuildingConnectionType.Default)
+        {
+            mat = connectionMat.Find(kvp => kvp.Key.Equals(ore))?.Value;
+        }
+        else {
+            mat = buildingConnectionMat.Find(kvp => kvp.Key.Equals(buildingConnectionType))?.Value;
+        }
         if (mat == null) return;
 
         List<GameObject> connections = GetAllConnections(structure);
