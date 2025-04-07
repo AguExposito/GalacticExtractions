@@ -142,13 +142,17 @@ public class BuildingSystem : MonoBehaviour
         {
             canPlace = ValidatePosition() && ValidatePositionBuilding();
 
-            UpdateLineRenderer(); 
+            UpdateLineRenderer();
 
-            SpriteRenderer sr = currentPreview.GetComponent<SpriteRenderer>();
+            if (currentPreview.TryGetComponent<SpriteRenderer>(out SpriteRenderer sr))
+            {
+                sr.color = canPlace ? validColor : invalidColor;
+                sr.sortingOrder = 20;
+            }
+            RecursivelyChangeChildColor(currentPreview, canPlace ? validColor : invalidColor);
             LineRenderer ln=currentPreview.GetComponent<LineRenderer>();
             ln.startColor = canPlace ? validColor : invalidColor;
             ln.endColor = canPlace ? validColor : invalidColor;
-            sr.color = canPlace? validColor : invalidColor;
         }
     }
     public void PositioningBuilding()
@@ -216,14 +220,19 @@ public class BuildingSystem : MonoBehaviour
             }
             this.selectedStructure = selectedStructure;
             currentPreview = Instantiate(selectedStructure, previewParent);
-            currentPreview.GetComponent<SpriteRenderer>().color = validColor;
-            currentPreview.GetComponent<SpriteRenderer>().sortingOrder = 20;
+            if (currentPreview.TryGetComponent<SpriteRenderer>(out SpriteRenderer sr))
+            {
+                sr.color = validColor;
+                sr.sortingOrder = 20;
+            }
+            RecursivelyChangeChildColor(currentPreview, validColor);
+
 #if PLATFORM_ANDROID
             radialMenu.PreviewView();
             radialMenu.ReparentAndResize(currentPreview.transform);
             radialMenu.gameObject.SetActive(true);
 #endif
-            currentPreview.GetComponent<LineRenderer>().enabled=true;
+            currentPreview.GetComponent<LineRenderer>().enabled = true;
             UpdateLineRenderer();
             isPlacing = true;
 
@@ -232,6 +241,20 @@ public class BuildingSystem : MonoBehaviour
             EnableLR();
         }
     }
+
+    private void RecursivelyChangeChildColor(GameObject go, Color color)
+    {
+        for (int i = 0; i < go.transform.childCount; i++)
+        {
+            if (go.transform.GetChild(i).TryGetComponent<SpriteRenderer>(out SpriteRenderer srchild))
+            {
+                srchild.color = color;
+                srchild.sortingOrder = 20;
+            }
+            RecursivelyChangeChildColor(go.transform.GetChild(i).gameObject, color);
+        }
+    }
+
     void UpdateLineRenderer() {
         LineRenderer border = currentPreview.GetComponent<LineRenderer>();
         if (border == null) return;
