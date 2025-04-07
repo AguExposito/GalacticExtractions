@@ -198,22 +198,4 @@ public class DrillController : Building
         }
 
     }
-
-    //void TryConnectToNearbyStations()
-    //{
-    //    int stationLayerMask = 1 << 8; 
-
-    //    Collider2D[] nearbyColliders = Physics2D.OverlapBoxAll(transform.position, searchRadius,0f, stationLayerMask);
-
-    //    foreach (Collider2D col in nearbyColliders)
-    //    {
-    //        if (col.gameObject == gameObject || col.transform.parent.gameObject == gameObject) continue; // No conectar consigo mismo
-    //        if (col.CompareTag("Storage") || col.CompareTag("Energy") || col.CompareTag("EnergyStorage")) 
-    //        {
-    //            if (col.gameObject == gameObject || col.transform.parent.gameObject == gameObject) return; // No conectar consigo mismo
-    //            connectionManager.CreateNewConnection(col, gameObject, drilling);
-    //            DefineVariableStates(col);
-    //        }
-    //    }
-    //}
 }

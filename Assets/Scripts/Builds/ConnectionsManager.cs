@@ -143,12 +143,28 @@ public class ConnectionsManager : MonoBehaviour
     public void ClearConnections(GameObject structure)
     {
         if (structure == null) return;
+
+        // Filtramos todas las entradas donde la clave sea la estructura que se va a destruir
         var toRemove = drillStationConnections
             .Where(kvp => kvp.Key == structure)
             .ToList();
 
         foreach (var connection in toRemove)
         {
+            GameObject connectionLine = connection.Value;
+            // Buscar la otra estructura conectada a esta misma línea
+            GameObject otherStructure = drillStationConnections
+                .Where(kvp => kvp.Value == connectionLine && kvp.Key != structure)
+                .Select(kvp => kvp.Key)
+                .FirstOrDefault();
+
+
+            if (otherStructure != null)
+            { 
+                otherStructure.GetComponent<Building>().RemoveSupply(structure);
+            }
+
+
             drillStationConnections.Remove(connection);
             if (connection.Value != null)
                 Destroy(connection.Value);

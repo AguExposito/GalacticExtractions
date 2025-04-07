@@ -71,7 +71,8 @@ public class RadialMenuController : MonoBehaviour
 
         ArrangeMenu();
     }
-    void DestroyGO(GameObject gameObject) {
+    void DestroyGO(GameObject gameObject)
+    {
         connectionManager.ClearConnections(gameObject);
         ReparentAndResize(null);
         Destroy(gameObject);
