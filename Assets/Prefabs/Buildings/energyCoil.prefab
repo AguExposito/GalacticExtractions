@@ -232,6 +232,8 @@ MonoBehaviour:
   onStorageDisabled:
     m_PersistentCalls:
       m_Calls: []
+  energySupply: []
+  storageSupply: []
   effectRange: {fileID: 6365146158360107913}
 --- !u!61 &-7823171981983721062
 BoxCollider2D:
@@ -440,7 +442,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 1
   simulationSpeed: 1
-  stopAction: 2
+  stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}

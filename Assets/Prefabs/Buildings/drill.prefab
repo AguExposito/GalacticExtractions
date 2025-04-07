@@ -188,7 +188,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5030058375571997708}
         m_TargetAssemblyTypeName: UnityEngine.ParticleSystem, UnityEngine
-        m_MethodName: Pause
+        m_MethodName: Stop
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -216,6 +216,8 @@ MonoBehaviour:
   onStorageDisabled:
     m_PersistentCalls:
       m_Calls: []
+  energySupply: []
+  storageSupply: []
   cellsToDrill: 10
   extractionDamage: 5
   timePerDmgTick: 0.2
@@ -494,7 +496,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 1
   simulationSpeed: 1
-  stopAction: 2
+  stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
