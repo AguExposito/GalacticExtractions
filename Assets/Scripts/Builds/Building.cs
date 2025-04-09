@@ -21,6 +21,11 @@ public class Building : MonoBehaviour
     void OnDestroy()
     {
         StructureNetworkManager.Instance?.UnregisterBuilding(this);
+
+        //foreach (Building station in StructureNetworkManager.Instance?.stationBuildings)
+        {
+            StructureNetworkManager.Instance?.RecalculateNetworks();
+        }
     }
 
     public void DetectNearbyStructures(bool selfConnection = false)

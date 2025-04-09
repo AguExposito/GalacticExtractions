@@ -6,6 +6,7 @@ public class StructureNetworkManager : MonoBehaviour
     public static StructureNetworkManager Instance { get; private set; }
 
     public List<Building> allBuildings = new List<Building>();
+    public List<Building> stationBuildings = new List<Building>();
 
     void Awake()
     {
@@ -17,6 +18,9 @@ public class StructureNetworkManager : MonoBehaviour
     {
         if (!allBuildings.Contains(b))
             allBuildings.Add(b);
+        if (b.CompareTag("EnergyStorage")) {
+            stationBuildings.Add (b);
+        }
     }
 
     public void UnregisterBuilding(Building b)
@@ -58,28 +62,29 @@ public class StructureNetworkManager : MonoBehaviour
         while (queue.Count > 0)
         {
             var current = queue.Dequeue();
-            if (current!=origin)
-            {
-                if (supplyType == "energy" && !current.hasEnergy)
-                    current.EnableEnergy(true);
-                else if (supplyType == "storage" && !current.hasStorage)
-                    current.EnableStorage(true);
-            }
+            //if (current!=origin)
+            //{
+            //    if (supplyType == "energy" && !current.hasEnergy)
+            //        current.EnableEnergy(true);
+            //    else if (supplyType == "storage" && !current.hasStorage)
+            //        current.EnableStorage(true);
+            //}
 
             foreach (var neighborGO in current.GetConnectedBuildings())
             {
                 var neighbor = neighborGO.GetComponent<Building>();
                 if (neighbor != null && !visited.Contains(neighbor))
                 {
-                    //if (neighbor.hasEnergy)
-                    //{
-                    //    if (supplyType == "energy") current.EnableEnergy(true);
-                    //}
-                     
-                    //if (neighbor.hasStorage) 
-                    //{
-                    //    if (supplyType == "storage") current.EnableStorage(true);
-                    //}
+                    if (current.hasEnergy)
+                    {
+                         neighbor.EnableEnergy(true);
+                    }
+
+                    if (current.hasStorage)
+                    {
+                        neighbor.EnableStorage(true);
+                    }
+
 
                     visited.Add(neighbor);
                     queue.Enqueue(neighbor);
