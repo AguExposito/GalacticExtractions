@@ -103,10 +103,8 @@ public class ConnectionsManager : MonoBehaviour
             lr.SetPositions(points);
 
         // Guardar la conexión nueva en la lista
-        KeyValuePairSerializable<GameObject, GameObject> newConnection = new KeyValuePairSerializable<GameObject, GameObject>(collider.gameObject, lrContainer);
-        drillStationConnections.Add(newConnection);
-        KeyValuePairSerializable<GameObject, GameObject> newConnection2 = new KeyValuePairSerializable<GameObject, GameObject>(currentGO, lrContainer);
-        drillStationConnections.Add(newConnection2);
+        drillStationConnections.Add(new KeyValuePairSerializable<GameObject, GameObject>(collider.gameObject, lrContainer));
+        drillStationConnections.Add(new KeyValuePairSerializable<GameObject, GameObject>(currentGO, lrContainer));
         
         if (buildingConnectionType == BuildingConnectionType.Default)
         {
@@ -154,6 +152,18 @@ public class ConnectionsManager : MonoBehaviour
         }
         return result;
     }
+    public List<GameObject> GetConnectedStructures(GameObject structure)
+    {
+        return drillStationConnections
+            .Where(kvp => kvp.Key == structure)
+            .Select(kvp => kvp.Value)
+            .Where(conn => conn != null)
+            .Select(conn =>
+                drillStationConnections.FirstOrDefault(kvp => kvp.Value == conn && kvp.Key != structure)?.Key
+            )
+            .Where(other => other != null)
+            .ToList();
+    }
 
 
     public void ClearConnections(GameObject structure)
@@ -175,10 +185,10 @@ public class ConnectionsManager : MonoBehaviour
                 .FirstOrDefault();
 
 
-            if (otherStructure != null)
-            { 
-                otherStructure.GetComponent<Building>().RemoveSupply(structure);
-            }
+            //if (otherStructure != null)
+            //{ 
+            //    otherStructure.GetComponent<Building>().RemoveSupply(structure);
+            //}
 
 
             drillStationConnections.Remove(connection);
