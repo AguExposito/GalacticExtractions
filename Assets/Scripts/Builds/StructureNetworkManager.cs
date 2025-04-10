@@ -45,14 +45,14 @@ public class StructureNetworkManager : MonoBehaviour
         foreach (var b in allBuildings)
         {
             if (b.IsEnergySource())
-                Propagate(b, supplyType: "energy");
+                Propagate(b);
         }
 
         // Storage
         foreach (var b in allBuildings)
         {
             if (b.IsStorageSource())
-                Propagate(b, supplyType: "storage");
+                Propagate(b);
         }
     }
     public void RecalculateNetworksFromStation()
@@ -64,11 +64,11 @@ public class StructureNetworkManager : MonoBehaviour
         }
         foreach (var b in stationBuildings)
         {
-                Propagate(b, supplyType: "storage");
+                Propagate(b);
         }
     }
 
-    private void Propagate(Building origin, string supplyType)
+    private void Propagate(Building origin)
     {
         Queue<Building> queue = new Queue<Building>();
         HashSet<Building> visited = new HashSet<Building>();
@@ -78,13 +78,6 @@ public class StructureNetworkManager : MonoBehaviour
         while (queue.Count > 0)
         {
             var current = queue.Dequeue();
-            //if (current!=origin)
-            //{
-            //    if (supplyType == "energy" && !current.hasEnergy)
-            //        current.EnableEnergy(true);
-            //    else if (supplyType == "storage" && !current.hasStorage)
-            //        current.EnableStorage(true);
-            //}
 
             foreach (var neighborGO in current.GetConnectedBuildings())
             {
