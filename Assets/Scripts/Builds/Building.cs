@@ -21,10 +21,13 @@ public class Building : MonoBehaviour
     void OnDestroy()
     {
         StructureNetworkManager.Instance?.UnregisterBuilding(this);
+    }
 
-        //foreach (Building station in StructureNetworkManager.Instance?.stationBuildings)
+    public void OnDestroyBuilding()
+    {
+        foreach (Building station in StructureNetworkManager.Instance?.stationBuildings)
         {
-            StructureNetworkManager.Instance?.RecalculateNetworks();
+            StructureNetworkManager.Instance?.RecalculateNetworksFromStation();
         }
     }
 
@@ -82,7 +85,7 @@ public class Building : MonoBehaviour
         if (state) onEnergyEnabled.Invoke();
         else onEnergyDisabled.Invoke();
         if (gameObject.TryGetComponent<Animator>(out Animator animator)) {
-            animator.SetBool("SwitchActiveState", true);
+            animator.SetBool("SwitchActiveState", state);
         }
     }
 
@@ -93,14 +96,14 @@ public class Building : MonoBehaviour
         else onStorageDisabled.Invoke();
         if (gameObject.TryGetComponent<Animator>(out Animator animator))
         {
-            animator.SetBool("SwitchActiveState", false);
+            animator.SetBool("SwitchActiveState", state);
         }
     }
 
     public void ResetNetworkFlags()
     {
-        hasEnergy = false;
-        hasStorage = false;
+        EnableEnergy(false);
+        EnableStorage(false);
     }
 
     public bool IsEnergySource()

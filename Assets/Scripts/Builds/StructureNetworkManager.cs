@@ -18,7 +18,7 @@ public class StructureNetworkManager : MonoBehaviour
     {
         if (!allBuildings.Contains(b))
             allBuildings.Add(b);
-        if (b.CompareTag("EnergyStorage")) {
+        if (b.CompareTag("EnergyStorage") && !stationBuildings.Contains(b)) {
             stationBuildings.Add (b);
         }
     }
@@ -26,6 +26,10 @@ public class StructureNetworkManager : MonoBehaviour
     public void UnregisterBuilding(Building b)
     {
         allBuildings.Remove(b);
+        if (stationBuildings.Contains(b))
+        {
+            stationBuildings.Remove(b);
+        }
     }
 
     public void RecalculateNetworks()
@@ -48,6 +52,18 @@ public class StructureNetworkManager : MonoBehaviour
         foreach (var b in allBuildings)
         {
             if (b.IsStorageSource())
+                Propagate(b, supplyType: "storage");
+        }
+    }
+    public void RecalculateNetworksFromStation()
+    {
+        foreach (var b in allBuildings)
+        {
+            if (!b.CompareTag("EnergyStorage"))
+                b.ResetNetworkFlags();
+        }
+        foreach (var b in stationBuildings)
+        {
                 Propagate(b, supplyType: "storage");
         }
     }
