@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7796301041861165630}
@@ -103,9 +103,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c396558e7d1d4ce49bcb3744174680b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  structureType: 2
   hasEnergy: 0
   hasStorage: 0
-  searchRadius: {x: 2, y: 2}
+  searchRadius: {x: 6, y: 6}
+  effectReach: {fileID: 6365146158360107913}
   connectionManager: {fileID: 0}
   onEnergyEnabled:
     m_PersistentCalls:
@@ -119,7 +121,6 @@ MonoBehaviour:
   onStorageDisabled:
     m_PersistentCalls:
       m_Calls: []
-  effectRange: {fileID: 6365146158360107913}
 --- !u!61 &-7823171981983721062
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -311,8 +312,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2080791055518327720}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -362,10 +363,10 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_Positions:
-  - {x: -0.5, y: -0.5, z: 0}
-  - {x: 0.5, y: -0.5, z: 0}
-  - {x: 0.5, y: 0.5, z: 0}
-  - {x: -0.5, y: 0.5, z: 0}
+  - {x: -1, y: -1, z: 0}
+  - {x: 1, y: -1, z: 0}
+  - {x: 1, y: 1, z: 0}
+  - {x: -1, y: 1, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1

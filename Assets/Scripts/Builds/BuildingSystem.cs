@@ -174,6 +174,7 @@ public class BuildingSystem : MonoBehaviour
     private Vector3 GetSnappedPosition(Vector3Int cellPos, GameObject preview)
     {
         Vector3 snapped = groundTilemap.GetCellCenterWorld(cellPos);
+        if (preview == null) return snapped;
 
         Vector3 scale = preview.transform.localScale;
         bool isEvenWidth = (scale.x % 2 == 0);

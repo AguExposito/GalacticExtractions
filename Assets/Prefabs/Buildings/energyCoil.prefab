@@ -53,9 +53,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c396558e7d1d4ce49bcb3744174680b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  structureType: 1
   hasEnergy: 0
   hasStorage: 0
   searchRadius: {x: 15, y: 15}
+  effectReach: {fileID: 6365146158360107913}
   connectionManager: {fileID: 0}
   onEnergyEnabled:
     m_PersistentCalls:
@@ -93,7 +95,6 @@ MonoBehaviour:
   onStorageDisabled:
     m_PersistentCalls:
       m_Calls: []
-  effectRange: {fileID: 6365146158360107913}
 --- !u!61 &-7823171981983721062
 BoxCollider2D:
   m_ObjectHideFlags: 0

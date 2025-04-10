@@ -4,9 +4,12 @@ using UnityEngine.Events;
 
 public class Building : MonoBehaviour
 {
+    public enum StructureType { Drill , Energy, Storage, EnergyStorage, Undefined}
+    public StructureType structureType;
     public bool hasEnergy = false;
     public bool hasStorage = false;
     public Vector2 searchRadius = new Vector2();
+    public GameObject effectReach;
     public ConnectionsManager connectionManager;
     public UnityEvent onEnergyEnabled;
     public UnityEvent onEnergyDisabled;
@@ -38,6 +41,11 @@ public class Building : MonoBehaviour
         int buildingsLayerMask = 1 << 8;
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, searchRadius, 0f, buildingsLayerMask);
 
+        //BoxCollider2D myArea = new GameObject("TempArea").AddComponent<BoxCollider2D>();
+        //myArea.size = searchRadius;
+        //myArea.transform.position = transform.position;
+        //myArea.gameObject.layer = gameObject.layer;
+
         foreach (Collider2D collider in colliders)
         {
             if (!selfConnection && collider.gameObject == gameObject) continue;
@@ -46,12 +54,24 @@ public class Building : MonoBehaviour
             Building otherBuilding = collider.GetComponent<Building>();
             if (otherBuilding == null) continue;
 
-            Vector2 offset = collider.transform.position - transform.position;
-            Vector2 otherRadius = otherBuilding.searchRadius;
+            //BoxCollider2D otherArea = new GameObject("TempAreaB").AddComponent<BoxCollider2D>();
+            //otherArea.size = otherBuilding.searchRadius;
+            //otherArea.transform.position = otherBuilding.transform.position;
+            //otherArea.gameObject.layer = collider.gameObject.layer;
 
-            if (Mathf.Abs(offset.x) > otherRadius.x / 2f || Mathf.Abs(offset.y) > otherRadius.y / 2f)
-                continue;
+            bool intersects = effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(collider.bounds);
+            bool intersects2 = collider.GetComponent<Building>().effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(gameObject.GetComponent<Collider2D>().bounds);
 
+            //GameObject.Destroy(otherArea.gameObject);
+
+            if (!intersects||!intersects2) continue;
+
+
+            //Vector2 offset = collider.transform.position - transform.position;
+            //Vector2 otherRadius = otherBuilding.searchRadius;
+
+            //if (Mathf.Abs(offset.x) > otherRadius.x / 2f || Mathf.Abs(offset.y) > otherRadius.y / 2f)
+            //    continue;
             if (collider.TryGetComponent<DrillController>(out DrillController drillController))
             {
                 connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling, BuildingConnectionType.Default, true);
@@ -72,6 +92,9 @@ public class Building : MonoBehaviour
         {
             case "Energy":
                 connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, BuildingConnectionType.Energy, true);
+                break;
+            case "Storage":
+                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, BuildingConnectionType.Storage, true);
                 break;
             default:
                 connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default);

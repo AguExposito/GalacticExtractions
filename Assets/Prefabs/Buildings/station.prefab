@@ -103,9 +103,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0200873b71eb69499aafce52945c31a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  structureType: 3
   hasEnergy: 1
   hasStorage: 1
   searchRadius: {x: 13, y: 13}
+  effectReach: {fileID: 4956008948219910704}
   connectionManager: {fileID: 0}
   onEnergyEnabled:
     m_PersistentCalls:

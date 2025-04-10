@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 public class StationController : Building
 {
-    public GameObject effectRange;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -15,16 +14,16 @@ public class StationController : Building
             connectionManager = FindFirstObjectByType<ConnectionsManager>();
         }
 
-        BoxCollider2D boxCollider2D = effectRange.AddComponent<BoxCollider2D>();
+        BoxCollider2D boxCollider2D = effectReach.AddComponent<BoxCollider2D>();
         boxCollider2D.size = new Vector2(searchRadius.x, searchRadius.y);
         boxCollider2D.isTrigger = true;
 
-        LineRenderer lr = effectRange.GetComponent<LineRenderer>();
+        LineRenderer lr = effectReach.GetComponent<LineRenderer>();
         SetLRCorners(lr);
 
         if (gameObject.tag == "Instantiated")
         {
-            gameObject.tag = "EnergyStorage";
+            gameObject.tag = structureType.ToString();
             DetectNearbyStructures(true);
         }        
     }

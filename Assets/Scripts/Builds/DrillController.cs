@@ -12,7 +12,6 @@ public class DrillController : Building
     public float tubeTime;
     public GameObject drillHead;
     public GameObject drillTube;
-    public GameObject effectReach;
     [Space]
     public OreNames drilling;
 
@@ -59,7 +58,7 @@ public class DrillController : Building
 
         if (gameObject.tag == "Instantiated")
         {
-            gameObject.tag = "Drill";
+            gameObject.tag = structureType.ToString();
             DetectNearbyStructures();
         }
     }

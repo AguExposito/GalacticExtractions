@@ -1320,6 +1320,8 @@ MonoBehaviour:
     Value: {fileID: 2100000, guid: 920fd7b26753432468354a6ddf9161f4, type: 2}
   - Key: 0
     Value: {fileID: 2100000, guid: 41def8ef714493b45ba20505bd240880, type: 2}
+  - Key: 1
+    Value: {fileID: 2100000, guid: f26c51b5601250a48b0266caef65bf1c, type: 2}
   drillStationConnections: []
 --- !u!114 &242178115
 MonoBehaviour:

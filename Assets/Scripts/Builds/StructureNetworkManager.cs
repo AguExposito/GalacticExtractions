@@ -86,12 +86,14 @@ public class StructureNetworkManager : MonoBehaviour
                 {
                     if (current.hasEnergy)
                     {
-                         neighbor.EnableEnergy(true);
+                        //if(neighbor.tag!="Storage")
+                            neighbor.EnableEnergy(true);   
                     }
 
                     if (current.hasStorage)
                     {
-                        neighbor.EnableStorage(true);
+                        //if (neighbor.tag != "Energy")
+                            neighbor.EnableStorage(true);
                     }
 
 
