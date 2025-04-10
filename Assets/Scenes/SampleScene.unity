@@ -1334,6 +1334,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allBuildings: []
+  stationBuildings: []
 --- !u!1 &349602037
 GameObject:
   m_ObjectHideFlags: 0
@@ -1681,7 +1682,7 @@ MonoBehaviour:
         m_MethodName: SelectStructure
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1173250798058949038, guid: 4ad43347ccc548341ad6ee4e88b359cc, type: 3}
+          m_ObjectArgument: {fileID: 1173250798058949038, guid: 8e8fc188f721bab4e9b7b51e42eb9451, type: 3}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -8172,6 +8173,10 @@ PrefabInstance:
     - target: {fileID: 6938389728007126931, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7928107868299409075, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
+      propertyPath: optionDistance
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 8016108374578785974, guid: d2a17120921fbdd47a62e17113b2fd12, type: 3}
       propertyPath: m_Name

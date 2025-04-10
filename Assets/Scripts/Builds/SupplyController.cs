@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnergyCoilController : Building
+public class SupplyController : Building
 {
     public GameObject effectRange;
     // Start is called once before the first execution of Update after the MonoBehaviour is created

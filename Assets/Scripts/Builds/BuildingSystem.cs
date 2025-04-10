@@ -163,13 +163,31 @@ public class BuildingSystem : MonoBehaviour
 
 
         cellPosition = groundTilemap.WorldToCell(worldPosition);
-        Vector3 snappedPosition = groundTilemap.GetCellCenterWorld(cellPosition);
+        Vector3 snappedPosition = GetSnappedPosition(cellPosition, currentPreview);
+
 
         if (currentPreview != null)
         {
             currentPreview.transform.position = snappedPosition;
         }
     }
+    private Vector3 GetSnappedPosition(Vector3Int cellPos, GameObject preview)
+    {
+        Vector3 snapped = groundTilemap.GetCellCenterWorld(cellPos);
+
+        Vector3 scale = preview.transform.localScale;
+        bool isEvenWidth = (scale.x % 2 == 0);
+        bool isEvenHeight = (scale.y % 2 == 0);
+
+        Vector3 offset = Vector3.zero;
+
+        // ajustar media celda en X y/o Y
+        if (isEvenWidth) offset.x += groundTilemap.cellSize.x / 2f;
+        if (isEvenHeight) offset.y += groundTilemap.cellSize.y / 2f;
+
+        return snapped + offset;
+    }
+
     public void DestroyPreview()
     {
 #if PLATFORM_ANDROID
@@ -305,11 +323,11 @@ public class BuildingSystem : MonoBehaviour
         Vector2 mousePosition = GetMouseOrTouchPosition2D();
 
         Vector3Int cellPosition = groundTilemap.WorldToCell(mousePosition);
-        Vector2 cellCenterPosition = groundTilemap.GetCellCenterWorld(cellPosition);
+        Vector3 snappedPosition = GetSnappedPosition(cellPosition, currentPreview);
 
 
         Vector2 size = currentPreview.transform.localScale - new Vector3(1,1,0); 
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(mousePosition, size, 0f);
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(snappedPosition, size, 0f);
         // Recorremos todos los colliders que hemos detectado
         foreach (Collider2D collider in colliders)
         {
