@@ -352,7 +352,7 @@ public class BuildingSystem : MonoBehaviour
             building.GetComponent<Collider2D>().enabled = true;
             building.tag = "Instantiated";
             DestroyPreview();
-
+            StructureNetworkManager.Instance?.CleanupNullReferences();
             //Se llama 2 veces para refrescar sin que cambie el estado
             EnableLR();
             EnableLR();

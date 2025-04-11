@@ -22,10 +22,18 @@ public class StructureNetworkManager : MonoBehaviour
             stationBuildings.Add (b);
         }
     }
+    public void CleanupNullReferences()
+    {
+        allBuildings.RemoveAll(b => b == null);
+        stationBuildings.RemoveAll(b => b == null);
+    }
 
     public void UnregisterBuilding(Building b)
     {
-        allBuildings.Remove(b);
+        if (allBuildings.Contains(b))
+        {
+            allBuildings.Remove(b);
+        }
         if (stationBuildings.Contains(b))
         {
             stationBuildings.Remove(b);
@@ -86,13 +94,13 @@ public class StructureNetworkManager : MonoBehaviour
                 {
                     if (current.hasEnergy)
                     {
-                        //if(neighbor.tag!="Storage")
+                        if(neighbor.tag!="Storage")
                             neighbor.EnableEnergy(true);   
                     }
 
                     if (current.hasStorage)
                     {
-                        //if (neighbor.tag != "Energy")
+                        if (neighbor.tag != "Energy")
                             neighbor.EnableStorage(true);
                     }
 

@@ -13,7 +13,7 @@ public class DrillController : Building
     public GameObject drillHead;
     public GameObject drillTube;
     [Space]
-    public OreNames drilling;
+    public OreNames drilling=OreNames.Default;
 
     Vector3Int nextCellPos;
     Vector3 initialHeadPos;
@@ -25,7 +25,8 @@ public class DrillController : Building
     Coroutine dmgCoroutine;
     InputSystem_Actions controls;
 
-    private void Awake()
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
         // Aseguramos que el sistema de input esté inicializado antes de usarlo
         controls = new InputSystem_Actions();
@@ -39,10 +40,8 @@ public class DrillController : Building
             new Vector3(-0.5f,0.5f+cellsToDrill,0),//TL
         };
         effectReach.GetComponent<LineRenderer>().SetPositions(corners);
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
+
+
         connectionManager = transform.parent.GetComponent<ConnectionsManager>();
         if (connectionManager == null)
         {
@@ -55,12 +54,13 @@ public class DrillController : Building
         initialHeadPos = drillHead.transform.position;
 
         ExtendTube();
-
         if (gameObject.tag == "Instantiated")
         {
             gameObject.tag = structureType.ToString();
             DetectNearbyStructures();
         }
+
+        
     }
 
     // Update is called once per frame

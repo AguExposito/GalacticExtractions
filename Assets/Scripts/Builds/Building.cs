@@ -19,9 +19,17 @@ public class Building : MonoBehaviour
     void Awake()
     {
         StructureNetworkManager.Instance?.RegisterBuilding(this);
+        if (connectionManager == null)
+        {
+            connectionManager = FindAnyObjectByType<ConnectionsManager>();
+        }
     }
 
     void OnDestroy()
+    {
+        StructureNetworkManager.Instance?.UnregisterBuilding(this);
+    }
+    private void OnDisable()
     {
         StructureNetworkManager.Instance?.UnregisterBuilding(this);
     }
@@ -32,6 +40,7 @@ public class Building : MonoBehaviour
         {
             StructureNetworkManager.Instance?.RecalculateNetworksFromStation();
         }
+        StructureNetworkManager.Instance?.UnregisterBuilding(this);
     }
 
     public void DetectNearbyStructures(bool selfConnection = false)
@@ -41,45 +50,48 @@ public class Building : MonoBehaviour
         int buildingsLayerMask = 1 << 8;
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, searchRadius, 0f, buildingsLayerMask);
 
-        //BoxCollider2D myArea = new GameObject("TempArea").AddComponent<BoxCollider2D>();
-        //myArea.size = searchRadius;
-        //myArea.transform.position = transform.position;
-        //myArea.gameObject.layer = gameObject.layer;
 
         foreach (Collider2D collider in colliders)
         {
+            Debug.Log("AAAAAAAAAAAA");
             if (!selfConnection && collider.gameObject == gameObject) continue;
             if (gameObject.tag == "Drill" && collider.tag == "Drill") continue;
 
             Building otherBuilding = collider.GetComponent<Building>();
             if (otherBuilding == null) continue;
 
-            //BoxCollider2D otherArea = new GameObject("TempAreaB").AddComponent<BoxCollider2D>();
-            //otherArea.size = otherBuilding.searchRadius;
-            //otherArea.transform.position = otherBuilding.transform.position;
-            //otherArea.gameObject.layer = collider.gameObject.layer;
+            Debug.Log("BBBBBBBBBBBB");
 
-            bool intersects = effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(collider.bounds);
-            bool intersects2 = collider.GetComponent<Building>().effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(gameObject.GetComponent<Collider2D>().bounds);
-
-            //GameObject.Destroy(otherArea.gameObject);
-
-            if (!intersects||!intersects2) continue;
-
-
-            //Vector2 offset = collider.transform.position - transform.position;
-            //Vector2 otherRadius = otherBuilding.searchRadius;
-
-            //if (Mathf.Abs(offset.x) > otherRadius.x / 2f || Mathf.Abs(offset.y) > otherRadius.y / 2f)
-            //    continue;
             if (collider.TryGetComponent<DrillController>(out DrillController drillController))
             {
                 connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling, BuildingConnectionType.Default, true);
+                
             }
             else
             {
-                DetermineConnectionMat(collider);
+                if (gameObject.tag == "Drill")
+                {
+                    Debug.Log("CCCCCCCCCCCC");
+                    // Si soy drill, veo si el otro tiene reach y me intersecta
+                    var otherReach = otherBuilding.effectReach?.GetComponent<BoxCollider2D>();
+                    if (otherReach == null) continue;
+
+                    if (!otherReach.bounds.Intersects(GetComponent<Collider2D>().bounds)) continue;
+                    //Vector2 offset = collider.transform.position - transform.position;
+                    //Vector2 otherRadius = otherBuilding.searchRadius;
+
+                    //if (Mathf.Abs(offset.x) > otherRadius.x / 2f || Mathf.Abs(offset.y) > otherRadius.y / 2f)
+                    //    continue;
+                }
+                else
+                {
+                    bool intersects = effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(collider.bounds);
+                    bool intersects2 = collider.GetComponent<Building>().effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(gameObject.GetComponent<Collider2D>().bounds);
+                    if (!intersects || !intersects2) continue;
+                }
             }
+            DetermineConnectionMat(collider);
+            
         }
 
         // Recalcula las redes globales (energía y almacenamiento)
@@ -97,7 +109,7 @@ public class Building : MonoBehaviour
                 connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, BuildingConnectionType.Storage, true);
                 break;
             default:
-                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default);
+                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, BuildingConnectionType.Default, true);
                 break;
         }
     }
@@ -108,7 +120,33 @@ public class Building : MonoBehaviour
         if (state) onEnergyEnabled.Invoke();
         else onEnergyDisabled.Invoke();
         if (gameObject.TryGetComponent<Animator>(out Animator animator)) {
-            animator.SetBool("SwitchActiveState", state);
+            switch (gameObject.tag) {
+                case "Energy":
+                    {
+                        animator.SetBool("SwitchActiveState", state);
+                    }
+                    break;
+                case "Storage":
+                    {
+                        //animator.SetBool("SwitchActiveState", state);
+                    }
+                    break;
+                case "EnergyStorage":
+                    {
+                        //animator.SetBool("SwitchActiveState", state);
+                    }
+                    break;
+                case "Drill":
+                    {
+                        //animator.SetBool("SwitchActiveState", state);
+                    }
+                    break;
+                default:
+                    {
+                        //animator.SetBool("SwitchActiveState", state);
+                    }
+                    break;
+            }
         }
     }
 
