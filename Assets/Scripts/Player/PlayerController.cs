@@ -4,8 +4,9 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 40f;
+    public Animator animator;
     private Rigidbody2D rb;
-    private Vector2 moveInput;
+    public Vector2 moveInput;
     public InputSystem_Actions controls;
     private DynamicJoystick joystick;
 
@@ -19,7 +20,7 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         controls.Player.Enable();
-        controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        controls.Player.Move.performed += ctx => { moveInput = ctx.ReadValue<Vector2>(); SetWalkAnimation(); };
         controls.Player.Move.canceled += ctx => moveInput = Vector2.zero;
     }
 
@@ -50,7 +51,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                joystick.gameObject.SetActive(false); // OCULTAR JOYSTICK SI NO SE USA
+               // joystick.gameObject.SetActive(false); // OCULTAR JOYSTICK SI NO SE USA
             }
         }
 
@@ -61,5 +62,38 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 input = new Vector2(joystick.Horizontal, joystick.Vertical);
         rb.MovePosition(rb.position + input * speed * Time.fixedDeltaTime);
+    }
+
+    void SetWalkAnimation() 
+    {
+        if (moveInput.y == 0 && moveInput.x != 0)
+        {
+            animator.SetLayerWeight(1, 1);
+            animator.SetLayerWeight(0, 0);
+        }
+        else 
+        {
+            animator.SetLayerWeight(1, 0);
+            animator.SetLayerWeight(0, 1);
+        }
+
+        if (moveInput.x < 0)
+        {
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+
+        if (moveInput.y > 0)
+        {
+            animator.SetBool("walkingForward", false);
+        }
+        else if(moveInput.y < 0)
+        {
+            animator.SetBool("walkingForward", true);
+        }
+
     }
 }
