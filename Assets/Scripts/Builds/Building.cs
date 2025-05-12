@@ -16,6 +16,38 @@ public class Building : MonoBehaviour
     public UnityEvent onStorageEnabled;
     public UnityEvent onStorageDisabled;
 
+    private bool CanConnectTo(Building otherBuilding)
+    {
+        // Drills can only connect to storage buildings
+        if (structureType == StructureType.Drill)
+        {
+            return otherBuilding.structureType == StructureType.Storage || 
+                   otherBuilding.structureType == StructureType.EnergyStorage;
+        }
+        
+        // Energy buildings can connect to drills and other energy buildings
+        if (structureType == StructureType.Energy)
+        {
+            return otherBuilding.structureType == StructureType.Drill || 
+                   otherBuilding.structureType == StructureType.Energy;
+        }
+        
+        // Storage buildings can connect to drills and other storage buildings
+        if (structureType == StructureType.Storage)
+        {
+            return otherBuilding.structureType == StructureType.Drill || 
+                   otherBuilding.structureType == StructureType.Storage;
+        }
+        
+        // EnergyStorage buildings can connect to everything
+        if (structureType == StructureType.EnergyStorage)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+
     void Awake()
     {
         StructureNetworkManager.Instance?.RegisterBuilding(this);
@@ -50,38 +82,29 @@ public class Building : MonoBehaviour
         int buildingsLayerMask = 1 << 8;
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, searchRadius, 0f, buildingsLayerMask);
 
-
         foreach (Collider2D collider in colliders)
         {
-            Debug.Log("AAAAAAAAAAAA");
             if (!selfConnection && collider.gameObject == gameObject) continue;
             if (gameObject.tag == "Drill" && collider.tag == "Drill") continue;
 
             Building otherBuilding = collider.GetComponent<Building>();
             if (otherBuilding == null) continue;
 
-            Debug.Log("BBBBBBBBBBBB");
+            // Check if buildings can connect to each other
+            if (!CanConnectTo(otherBuilding) && !otherBuilding.CanConnectTo(this)) continue;
 
             if (collider.TryGetComponent<DrillController>(out DrillController drillController))
             {
                 connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling, BuildingConnectionType.Default, true);
-                
             }
             else
             {
                 if (gameObject.tag == "Drill")
                 {
-                    Debug.Log("CCCCCCCCCCCC");
-                    // Si soy drill, veo si el otro tiene reach y me intersecta
                     var otherReach = otherBuilding.effectReach?.GetComponent<BoxCollider2D>();
                     if (otherReach == null) continue;
 
                     if (!otherReach.bounds.Intersects(GetComponent<Collider2D>().bounds)) continue;
-                    //Vector2 offset = collider.transform.position - transform.position;
-                    //Vector2 otherRadius = otherBuilding.searchRadius;
-
-                    //if (Mathf.Abs(offset.x) > otherRadius.x / 2f || Mathf.Abs(offset.y) > otherRadius.y / 2f)
-                    //    continue;
                 }
                 else
                 {
@@ -91,10 +114,9 @@ public class Building : MonoBehaviour
                 }
             }
             DetermineConnectionMat(collider);
-            
         }
 
-        // Recalcula las redes globales (energía y almacenamiento)
+        // Recalculate global networks (energy and storage)
         StructureNetworkManager.Instance?.RecalculateNetworks();
     }
 
