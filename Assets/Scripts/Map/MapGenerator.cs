@@ -73,7 +73,7 @@ public class MapGenerator : MonoBehaviour
     //Genera las grutas/suelo en el terreno
     void GenerateGrutas()
     {
-        int numGrutas = width / 8; // Número de grutas ajustado para buena distribución
+        int numGrutas = width / 8; // Nï¿½mero de grutas ajustado para buena distribuciï¿½n
         for (int i = 0; i < numGrutas; i++)
         {
             int startX = Random.Range(5, width - 5);
@@ -88,7 +88,7 @@ public class MapGenerator : MonoBehaviour
                 // Solo eliminar si estamos en la superficie o ligeramente por debajo
                 if (y >= groundLevel - 5)
                 {
-                    int caveWidth = Mathf.FloorToInt(Random.Range(1, 3) * caveWidthMultiplier); // Grutas más anchas
+                    int caveWidth = Mathf.FloorToInt(Random.Range(1, 3) * caveWidthMultiplier); // Grutas mï¿½s anchas
 
                     for (int w = -caveWidth; w <= caveWidth; w++)
                     {
@@ -97,7 +97,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    break; // Detener la eliminación al llegar a la cueva
+                    break; // Detener la eliminaciï¿½n al llegar a la cueva
                 }
 
                 y--;
@@ -127,7 +127,7 @@ public class MapGenerator : MonoBehaviour
                     if (caveNoise > caveThreshold && wallsTilemap.GetTile(new Vector3Int(x, y, 0)) == null)
                     {
                         wallsTilemap.SetTile(new Vector3Int(x, y, 0), wallTile);                        
-                        wallTileData.Add(new Vector3Int(x, y, 0), new TileData(new Vector3Int(x, y, 0), wallTile, TileData.TileType.wall));
+                        wallTileData.Add(new Vector3Int(x, y, 0), new TileData(new Vector3Int(x, y, 0), wallTile, TileType.wall));
                     }
                 }
             }
@@ -157,10 +157,10 @@ public class MapGenerator : MonoBehaviour
         float noise = Mathf.PerlinNoise(x * noiseStrength, y * noiseStrength);
         float blend = Mathf.Lerp(0f, 1f, noise);
 
-        // Mezcla los colores de los gradientes de forma más orgánica
+        // Mezcla los colores de los gradientes de forma mï¿½s orgï¿½nica
         Color mixedColor = Color.Lerp(colorX, colorY, blend);
 
-        // Determinar el bioma más cercano al color generado
+        // Determinar el bioma mï¿½s cercano al color generado
         int closestIndex = 0;
         float minDistance = float.MaxValue;
         for (int i = 0; i < groundTiles.Length; i++)
@@ -185,7 +185,7 @@ public class MapGenerator : MonoBehaviour
         float[] biomeSizes = new float[groundTiles.Length];
         float remainingSpace = 1f;
 
-        // Distribuir tamaños de biomas asegurando que respeten los mínimos
+        // Distribuir tamaï¿½os de biomas asegurando que respeten los mï¿½nimos
         for (int i = 0; i < groundTiles.Length; i++)
         {
             float maxAvailable = Mathf.Min(maxBiomeSize, remainingSpace - (minBiomeSize * (groundTiles.Length - (i + 1))));
@@ -193,7 +193,7 @@ public class MapGenerator : MonoBehaviour
             remainingSpace -= biomeSizes[i];
         }
 
-        // Asegurar que el último bioma use el espacio restante
+        // Asegurar que el ï¿½ltimo bioma use el espacio restante
         biomeSizes[groundTiles.Length - 1] += remainingSpace;
 
         //float currentPositionX = 0f;
@@ -235,7 +235,7 @@ public class MapGenerator : MonoBehaviour
     {
         for (int i = array.Length - 1; i > 0; i--)
         {
-            int j = Random.Range(0, i + 1);  // Genera un índice aleatorio
+            int j = Random.Range(0, i + 1);  // Genera un ï¿½ndice aleatorio
             TileBase temp = array[i];
             array[i] = array[j];
             array[j] = temp;

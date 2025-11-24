@@ -57,7 +57,7 @@ public class OreGenerator : MonoBehaviour
             if (!foundValidTile)
             {
                 Debug.LogWarning("No valid tile found for ore cluster after max attempts.");
-                continue; // Saltar esta iteración si no se encontró un tile válido
+                continue; // Saltar esta iteraciï¿½n si no se encontrï¿½ un tile vï¿½lido
             }
 
             TileBase oreType = null;
@@ -98,17 +98,17 @@ public class OreGenerator : MonoBehaviour
 
             if (!oreTileData.ContainsKey(current))
             {
-                oreTileData.Add(current, new TileData(current, oreType, TileData.TileType.ore));
+                oreTileData.Add(current, new TileData(current, oreType, TileType.ore));
                 mapGenerator.wallTileData.Remove(current);
             }
             closedSet.Add(current);
 
             foreach (Vector3Int neighbor in GetNeighbors(current))
             {
-                // Solo expande si es un tile válido y no ha sido visitado
+                // Solo expande si es un tile vï¿½lido y no ha sido visitado
                 if (!closedSet.Contains(neighbor) && mapGenerator.wallsTilemap.HasTile(neighbor))
                 {
-                    if (Random.value > 0.3f) // Probabilidad de expansión
+                    if (Random.value > 0.3f) // Probabilidad de expansiï¿½n
                     {
                         openSet.Enqueue(neighbor);
                     }

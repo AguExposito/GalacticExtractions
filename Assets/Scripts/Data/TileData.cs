@@ -2,8 +2,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-public enum OreType { basic, soft, semihard, hard }
-public enum OreNames { Default, Fliotex, Polarnyx, Trevonita }
+
 public class OreData {
     public OreType ore;
     public OreNames oreName;
@@ -14,8 +13,6 @@ public class OreData {
 }
 public class TileData:OreData
 {
-    public enum TileType { wall, ore }
-    public enum BiomeType { ground ,dirt, desert, snow }
 
     public Vector3Int position;
     public TileBase tile;
@@ -86,7 +83,7 @@ public class TileData:OreData
                 } break;
             default: {
                     biomeResources = biomeResources.transform.GetChild(0).gameObject;
-                    Debug.LogWarning("SE AUTOASIGNO BIOMA A GROUND, REVISAR SI FALTA AÑADIR UN BIOMA AL SWITCH"); 
+                    Debug.LogWarning("SE AUTOASIGNO BIOMA A GROUND, REVISAR SI FALTA Aï¿½ADIR UN BIOMA AL SWITCH"); 
                     biome = BiomeType.ground; 
                 } break;
         }        
@@ -132,7 +129,7 @@ public class TileData:OreData
 
     public int ExtractOre()
     {
-        if (extractedOres >= oreAmount || health <= 0 || type == TileType.wall) return 0; // Ya está agotado
+        if (extractedOres >= oreAmount || health <= 0 || type == TileType.wall) return 0; // Ya estï¿½ agotado
 
         int expectedExtractedOres = oreAmount - Mathf.FloorToInt((health / (float)maxHealth) * oreAmount);
 

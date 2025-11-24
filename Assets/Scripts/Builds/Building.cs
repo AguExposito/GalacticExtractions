@@ -93,9 +93,15 @@ public class Building : MonoBehaviour
             // Check if buildings can connect to each other
             if (!CanConnectTo(otherBuilding) && !otherBuilding.CanConnectTo(this)) continue;
 
+            // Check if we need to create a connection
+            bool shouldCreateConnection = false;
+            BuildingConnectionType connectionType = BuildingConnectionType.Default;
+            OreNames oreType = OreNames.Default;
+
             if (collider.TryGetComponent<DrillController>(out DrillController drillController))
             {
-                connectionManager.CreateNewConnection(collider, gameObject, drillController.drilling, BuildingConnectionType.Default, true);
+                shouldCreateConnection = true;
+                oreType = drillController.drilling;
             }
             else
             {
@@ -105,15 +111,31 @@ public class Building : MonoBehaviour
                     if (otherReach == null) continue;
 
                     if (!otherReach.bounds.Intersects(GetComponent<Collider2D>().bounds)) continue;
+                    shouldCreateConnection = true;
                 }
                 else
                 {
                     bool intersects = effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(collider.bounds);
                     bool intersects2 = collider.GetComponent<Building>().effectReach.GetComponent<BoxCollider2D>().bounds.Intersects(gameObject.GetComponent<Collider2D>().bounds);
                     if (!intersects || !intersects2) continue;
+                    shouldCreateConnection = true;
+                }
+
+                // Determine connection type based on building types
+                if (otherBuilding.structureType == StructureType.Energy || structureType == StructureType.Energy)
+                {
+                    connectionType = BuildingConnectionType.Energy;
+                }
+                else if (otherBuilding.structureType == StructureType.Storage || structureType == StructureType.Storage)
+                {
+                    connectionType = BuildingConnectionType.Storage;
                 }
             }
-            DetermineConnectionMat(collider);
+
+            if (shouldCreateConnection)
+            {
+                connectionManager.CreateNewConnection(collider, gameObject, oreType, connectionType, false);
+            }
         }
 
         // Recalculate global networks (energy and storage)
@@ -122,18 +144,20 @@ public class Building : MonoBehaviour
 
     void DetermineConnectionMat(Collider2D collider)
     {
-        switch (collider.tag)
+        Building otherBuilding = collider.GetComponent<Building>();
+        if (otherBuilding == null) return;
+
+        BuildingConnectionType connectionType = BuildingConnectionType.Default;
+        if (otherBuilding.structureType == StructureType.Energy || structureType == StructureType.Energy)
         {
-            case "Energy":
-                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, BuildingConnectionType.Energy, true);
-                break;
-            case "Storage":
-                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, BuildingConnectionType.Storage, true);
-                break;
-            default:
-                connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, BuildingConnectionType.Default, true);
-                break;
+            connectionType = BuildingConnectionType.Energy;
         }
+        else if (otherBuilding.structureType == StructureType.Storage || structureType == StructureType.Storage)
+        {
+            connectionType = BuildingConnectionType.Storage;
+        }
+
+        connectionManager.CreateNewConnection(collider, gameObject, OreNames.Default, connectionType, false);
     }
 
     public void EnableEnergy(bool state)

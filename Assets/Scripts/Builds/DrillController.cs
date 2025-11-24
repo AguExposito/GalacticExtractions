@@ -18,7 +18,6 @@ public class DrillController : Building
     Vector3Int nextCellPos;
     Vector3 initialHeadPos;
     bool isExtending;
-    bool isBeingDestroyed;
     Tilemap oreTilemap;
     Tilemap wallsTilemap;
     DamageTile damageTile;
@@ -28,7 +27,7 @@ public class DrillController : Building
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Aseguramos que el sistema de input esté inicializado antes de usarlo
+        // Aseguramos que el sistema de input estï¿½ inicializado antes de usarlo
         controls = new InputSystem_Actions();
         EnhancedTouchSupport.Enable();
 
@@ -99,7 +98,6 @@ public class DrillController : Building
     }
     private void OnDestroy()
     {
-        isBeingDestroyed = true;
         if (dmgCoroutine != null)
         {
             StopCoroutine(dmgCoroutine);
@@ -119,7 +117,7 @@ public class DrillController : Building
             }
         }
         isExtending = true;
-        Debug.Log("No hay más Tiles para destruir");
+        Debug.Log("No hay mï¿½s Tiles para destruir");
         return false;
     }
     Vector3Int GetDrillDirection()
@@ -193,7 +191,7 @@ public class DrillController : Building
         {
             damageTile.DamageTileData(targetCell, damagePerTick);
 
-            yield return new WaitForSeconds(timePerTick); // Espera antes de aplicar el siguiente daño
+            yield return new WaitForSeconds(timePerTick); // Espera antes de aplicar el siguiente daï¿½o
         }
 
     }

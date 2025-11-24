@@ -54,7 +54,7 @@ public class KeyValuePairSerializable<TKey, TValue>
         Key = newKey;
     }
 
-    // M閠odo para establecer un nuevo valor
+    // M锟絫odo para establecer un nuevo valor
     public void SetValue(TValue newValue)
     {
         Value = newValue;
@@ -67,10 +67,15 @@ public class ConnectionsManager : MonoBehaviour
     public List<KeyValuePairSerializable<GameObject,GameObject>> drillStationConnections = new List<KeyValuePairSerializable<GameObject, GameObject>>();
 
 
-    public void CreateNewConnection(Collider2D collider, GameObject currentGO, OreNames ore = OreNames.Default, BuildingConnectionType buildingConnectionType = BuildingConnectionType.Default, bool isInverse =false)
+    public void CreateNewConnection(Collider2D collider, GameObject currentGO, OreNames ore = OreNames.Default, BuildingConnectionType buildingConnectionType = BuildingConnectionType.Default, bool isInverse = false)
     {
+        // Check if connection already exists
+        if (ConnectionExists(collider.gameObject, currentGO))
+        {
+            return;
+        }
 
-        // Crear un nuevo objeto para la conexi髇
+        // Create a new object for the connection
         GameObject lrContainer = new GameObject("ConnectionLine");
         lrContainer.transform.SetParent(transform);
 
@@ -79,63 +84,131 @@ public class ConnectionsManager : MonoBehaviour
         lr.endWidth = 0.15f;
         lr.sortingOrder = 8;
         lr.positionCount = 2;
-        lr.material = connectionMat[0].Value;
 
-        // Definir los puntos de conexi髇
-
+        // Determine correct direction based on building types
         Vector3[] points;
-        if (isInverse) {
-            points= new Vector3[]
+        bool shouldInverse = ShouldInverseConnection(collider.gameObject, currentGO);
+        
+        if (shouldInverse) {
+            points = new Vector3[]
             {
-                    currentGO.transform.position,
-                    collider.gameObject.transform.position
+                currentGO.transform.position,
+                collider.gameObject.transform.position
             };
         }
         else
         {
             points = new Vector3[]
             {
-                    collider.gameObject.transform.position,
-                    currentGO.transform.position
+                collider.gameObject.transform.position,
+                currentGO.transform.position
             };
-
         }
-            lr.SetPositions(points);
-
-        // Guardar la conexi髇 nueva en la lista
-        drillStationConnections.Add(new KeyValuePairSerializable<GameObject, GameObject>(collider.gameObject, lrContainer));
-        drillStationConnections.Add(new KeyValuePairSerializable<GameObject, GameObject>(currentGO, lrContainer));
         
+        lr.SetPositions(points);
+
+        // Calculate direction for shader
+        Vector3 direction = (points[1] - points[0]).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        
+        // Assign material based on connection type
+        Material connectionMaterial;
         if (buildingConnectionType == BuildingConnectionType.Default)
         {
-            AssignConnectionMaterial(currentGO, ore);
+            connectionMaterial = connectionMat.Find(kvp => kvp.Key.Equals(ore))?.Value;
         }
-        else {
-            AssignConnectionMaterial(currentGO, ore, buildingConnectionType);
+        else 
+        {
+            connectionMaterial = buildingConnectionMat.Find(kvp => kvp.Key.Equals(buildingConnectionType))?.Value;
         }
+
+        if (connectionMaterial != null)
+        {
+            Material instanceMaterial = new Material(connectionMaterial);
+            // Rotar el material para que coincida con la direcci贸n de la conexi贸n
+            instanceMaterial.SetFloat("_Rotation", -angle); // Negamos el 谩ngulo para que coincida con la direcci贸n correcta
+            // Ajustar el tiling para que la textura se repita correctamente
+            float distance = Vector3.Distance(points[0], points[1]);
+            instanceMaterial.SetFloat("_Tiling", distance * 2); // Multiplicamos por 2 para que la textura se repita m谩s veces
+            lr.material = instanceMaterial;
+        }
+
+        // Save the connection
+        drillStationConnections.Add(new KeyValuePairSerializable<GameObject, GameObject>(collider.gameObject, lrContainer));
+        drillStationConnections.Add(new KeyValuePairSerializable<GameObject, GameObject>(currentGO, lrContainer));
+    }
+
+    private bool ConnectionExists(GameObject building1, GameObject building2)
+    {
+        var connections1 = GetAllConnections(building1);
+        var connections2 = GetAllConnections(building2);
+        
+        return connections1.Any(conn1 => connections2.Contains(conn1));
+    }
+
+    private bool ShouldInverseConnection(GameObject building1, GameObject building2)
+    {
+        Building b1 = building1.GetComponent<Building>();
+        Building b2 = building2.GetComponent<Building>();
+        
+        if (b1 == null || b2 == null) return false;
+
+        // Energy buildings should be the source
+        if (b1.structureType == Building.StructureType.Energy && b2.structureType == Building.StructureType.Drill)
+            return false;
+        if (b2.structureType == Building.StructureType.Energy && b1.structureType == Building.StructureType.Drill)
+            return true;
+
+        // Storage buildings should be the destination for drills
+        if (b1.structureType == Building.StructureType.Drill && 
+            (b2.structureType == Building.StructureType.Storage || b2.structureType == Building.StructureType.EnergyStorage))
+            return false;
+        if (b2.structureType == Building.StructureType.Drill && 
+            (b1.structureType == Building.StructureType.Storage || b1.structureType == Building.StructureType.EnergyStorage))
+            return true;
+
+        // Default case: use the original isInverse parameter
+        return false;
     }
 
     public void AssignConnectionMaterial(GameObject structure, OreNames ore = OreNames.Default, BuildingConnectionType buildingConnectionType = BuildingConnectionType.Default)
     {
         if (structure == null) return;
+
         Material mat;
         if (buildingConnectionType == BuildingConnectionType.Default)
         {
             mat = connectionMat.Find(kvp => kvp.Key.Equals(ore))?.Value;
         }
-        else {
+        else 
+        {
             mat = buildingConnectionMat.Find(kvp => kvp.Key.Equals(buildingConnectionType))?.Value;
         }
+
         if (mat == null) return;
 
         List<GameObject> connections = GetAllConnections(structure);
         foreach (GameObject conn in connections)
         {
             if (conn == null || conn.Equals(null)) continue;
+
             LineRenderer lr = conn.GetComponent<LineRenderer>();
             if (lr != null)
             {
-                lr.material = mat;
+                // Calculate direction for shader
+                Vector3[] positions = new Vector3[2];
+                lr.GetPositions(positions);
+                Vector3 direction = (positions[1] - positions[0]).normalized;
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+                // Create a new material instance
+                Material instanceMaterial = new Material(mat);
+                // Rotar el material para que coincida con la direcci贸n de la conexi贸n
+                instanceMaterial.SetFloat("_Rotation", -angle); // Negamos el 谩ngulo para que coincida con la direcci贸n correcta
+                // Ajustar el tiling para que la textura se repita correctamente
+                float distance = Vector3.Distance(positions[0], positions[1]);
+                instanceMaterial.SetFloat("_Tiling", distance * 2); // Multiplicamos por 2 para que la textura se repita m谩s veces
+                lr.material = instanceMaterial;
             }
         }
     }
@@ -170,7 +243,6 @@ public class ConnectionsManager : MonoBehaviour
     {
         if (structure == null) return;
 
-        // Filtramos todas las entradas donde la clave sea la estructura que se va a destruir
         var toRemove = drillStationConnections
             .Where(kvp => kvp.Key == structure)
             .ToList();
@@ -178,22 +250,12 @@ public class ConnectionsManager : MonoBehaviour
         foreach (var connection in toRemove)
         {
             GameObject connectionLine = connection.Value;
-            // Buscar la otra estructura conectada a esta misma l韓ea
-            GameObject otherStructure = drillStationConnections
-                .Where(kvp => kvp.Value == connectionLine && kvp.Key != structure)
-                .Select(kvp => kvp.Key)
-                .FirstOrDefault();
-
-
-            //if (otherStructure != null)
-            //{ 
-            //    otherStructure.GetComponent<Building>().RemoveSupply(structure);
-            //}
-
-
-            drillStationConnections.Remove(connection);
-            if (connection.Value != null)
-                Destroy(connection.Value);
+            if (connectionLine != null)
+            {
+                // Remove all references to this connection
+                drillStationConnections.RemoveAll(kvp => kvp.Value == connectionLine);
+                Destroy(connectionLine);
+            }
         }
     }
 
